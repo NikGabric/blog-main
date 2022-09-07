@@ -20,6 +20,10 @@
         "blogAppApiLamdbaF": {
           "deploymentBucketName": "amplify-blogapp-dev-135111-deployment",
           "s3Key": "amplify-builds/blogAppApiLamdbaF-567841574d733049345a-build.zip"
+        },
+        "PostsHandler": {
+          "deploymentBucketName": "amplify-blogapp-dev-135111-deployment",
+          "s3Key": "amplify-builds/PostsHandler-4b63436e426a41554f77-build.zip"
         }
       }
     }

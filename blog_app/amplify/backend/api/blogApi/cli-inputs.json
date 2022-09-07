@@ -1,9 +1,9 @@
 {
   "version": 1,
   "paths": {
-    "/api": {
-      "name": "/api",
-      "lambdaFunction": "blogAppApiLamdbaF",
+    "/posts/{postId}": {
+      "name": "/posts/{postId}",
+      "lambdaFunction": "PostsHandler",
       "permissions": {
         "setting": "protected",
         "auth": [
