@@ -8,9 +8,15 @@ import { AppRoutingModule } from '../app-routing.module';
 import { AppComponent } from './app.component';
 import { AuthComponent } from './components/auth/auth.component';
 import { HomepageComponent } from './components/homepage/homepage.component';
+import { CreatePostComponent } from './components/create-post/create-post.component';
 
 @NgModule({
-  declarations: [AppComponent, AuthComponent, HomepageComponent],
+  declarations: [
+    AppComponent,
+    AuthComponent,
+    HomepageComponent,
+    CreatePostComponent,
+  ],
   imports: [
     BrowserModule,
     AppRoutingModule,
