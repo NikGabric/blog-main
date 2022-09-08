@@ -1,0 +1,83 @@
+<div class="container p-5 content">
+  <div class="row justify-content-center">
+    <div class="col-10 col-lg-6 col-sm-8 col-xl-6">
+      <div class="card bg-light" style="border-radius: 0.5rem">
+        <div class="card-body text-center">
+          <h3>Register</h3>
+
+          <form (ngSubmit)="register()">
+            <div class="form-floating mb-3">
+              <input
+                type="username"
+                class="form-control"
+                placeholder="Username"
+                name="username"
+                #username="ngModel"
+                [(ngModel)]="user.username"
+              />
+              <label for="floatingInput">Username</label>
+            </div>
+
+            <div class="form-floating mb-3">
+              <input
+                type="text"
+                class="form-control"
+                id="registerEmail"
+                placeholder="Email"
+                name="email"
+                #email="ngModel"
+                [(ngModel)]="user.attributes.email"
+              />
+              <span
+                id="reset_msg"
+                style="display: none; color: red; text-align: left"
+                >Napačen vnos email naslova</span
+              >
+              <label for="floatingInput">Email address</label>
+            </div>
+
+            <div class="form-floating mb-3">
+              <input
+                type="password"
+                class="form-control"
+                id="registerPassword"
+                placeholder="Password"
+                name="password"
+                #password="ngModel"
+                [(ngModel)]="user.password"
+              />
+              <label for="floatingInput">Password</label>
+            </div>
+
+            <div class="form-floating mt-3">
+              <input
+                type="password"
+                class="form-control"
+                id="registerPassword2"
+                name="password2"
+                placeholder="Password"
+                [(ngModel)]="password2"
+              />
+              <span
+                id="registerErrorPassword2"
+                style="display: none; color: red; text-align: left"
+                >Gesli se ne ujemata</span
+              >
+              <label for="floatingInput">Repeat password</label>
+            </div>
+
+            <div
+              class="d-flex justify-content-start p-1"
+              style="font-size: small; color: red"
+              *ngIf="passError"
+            >
+              * Password must be at least 8 characters long!
+            </div>
+
+            <button type="submit" class="btn btn-primary">Register</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

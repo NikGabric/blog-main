@@ -1,12 +1,62 @@
-<div class="p-5">
-  <amplify-authenticator>
-    <ng-template
-      amplifySlot="authenticated"
-      let-user="user"
-      let-signOut="signOut"
-    >
-      <h1>Welcome {{ user.username }}!</h1>
-      <button (click)="signOut()">Sign Out</button>
-    </ng-template>
-  </amplify-authenticator>
+<div class="container p-5 content">
+  <div class="row justify-content-center">
+    <div class="col-10 col-lg-6 col-sm-8 col-xl-6">
+      <div class="card bg-light" style="border-radius: 0.5rem">
+        <div class="card-body text-center">
+          <h3 class="mb-3">Login</h3>
+
+          <form (ngSubmit)="login()">
+            <div class="form-floating mb-3">
+              <input
+                type="username"
+                class="form-control"
+                placeholder="Username"
+                name="username"
+                [(ngModel)]="loginParams.username"
+                style="text-align: center"
+              />
+              <label for="floatingInput">Username</label>
+            </div>
+
+            <div class="form-floating mb-3">
+              <input
+                type="password"
+                class="form-control"
+                id="loginPassword"
+                placeholder="Password"
+                name="password"
+                [(ngModel)]="loginParams.password"
+                style="text-align: center"
+              />
+              <span
+                id="passError"
+                style="display: none; color: red; text-align: left"
+                >Geslo mora biti vsaj 8 znakov dolgo</span
+              >
+              <label for="floatingInput">Password</label>
+            </div>
+
+            <div class="mb-4 justify-content-start" style="font-size: small">
+              <a href=""> Forgot password? </a>
+            </div>
+
+            <div class="mb-3 form-check d-flex justify-content-center">
+              <input
+                type="checkbox"
+                class="form-check-input"
+                id="loginRememberPassword"
+              />
+              <label for="loginRememberPassword">Remember password</label>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Login</button>
+
+            <hr />
+
+            <a routerLink="/register">Register for an account.</a>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

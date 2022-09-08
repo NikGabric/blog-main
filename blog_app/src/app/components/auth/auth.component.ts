@@ -6,7 +6,10 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./auth.component.scss'],
 })
 export class AuthComponent implements OnInit {
+  public loginParams = { username: '', password: '' };
+  public login(): void {
+    console.log(this.loginParams);
+  }
   constructor() {}
-
   ngOnInit(): void {}
 }

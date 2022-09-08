@@ -10,6 +10,7 @@ import { AuthComponent } from './components/auth/auth.component';
 import { HomepageComponent } from './components/homepage/homepage.component';
 import { CreatePostComponent } from './components/create-post/create-post.component';
 import { PostDetailsComponent } from './components/post-details/post-details.component';
+import { RegisterComponent } from './components/register/register.component';
 
 @NgModule({
   declarations: [
@@ -18,6 +19,7 @@ import { PostDetailsComponent } from './components/post-details/post-details.com
     HomepageComponent,
     CreatePostComponent,
     PostDetailsComponent,
+    RegisterComponent,
   ],
   imports: [
     BrowserModule,
