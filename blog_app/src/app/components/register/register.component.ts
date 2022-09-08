@@ -17,6 +17,7 @@ export class RegisterComponent implements OnInit {
     this.user = {} as User;
     this.password2 = '';
     this.passError = false;
+    console.log(this.user);
   }
 
   public register(): void {

@@ -8,9 +8,7 @@ import { environment } from '../../environments/environment';
 export interface User {
   username: string;
   password: string;
-  attributes: {
-    email: string;
-  };
+  email: string;
   code: string;
 }
 
@@ -31,6 +29,9 @@ export class CognitoService {
     return Auth.signUp({
       username: user.username,
       password: user.password,
+      attributes: {
+        email: user.email,
+      },
     });
   }
 
