@@ -2,6 +2,17 @@
  * @type {import('@types/aws-lambda').APIGatewayProxyHandler}
  */
 
+const AWS = require("aws-sdk");
+const docClient = new AWS.DynamoDB.DocumentClient();
+
+async function createItem(params) {
+  try {
+    await docClient.put(params).promise();
+  } catch (err) {
+    return err;
+  }
+}
+
 exports.handler = async (event) => {
   console.log(`EVENT: ${JSON.stringify(event)}`);
   const post = { postId: postId };

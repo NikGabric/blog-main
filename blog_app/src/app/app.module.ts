@@ -9,6 +9,7 @@ import { AppComponent } from './app.component';
 import { AuthComponent } from './components/auth/auth.component';
 import { HomepageComponent } from './components/homepage/homepage.component';
 import { CreatePostComponent } from './components/create-post/create-post.component';
+import { PostDetailsComponent } from './components/post-details/post-details.component';
 
 @NgModule({
   declarations: [
@@ -16,6 +17,7 @@ import { CreatePostComponent } from './components/create-post/create-post.compon
     AuthComponent,
     HomepageComponent,
     CreatePostComponent,
+    PostDetailsComponent,
   ],
   imports: [
     BrowserModule,

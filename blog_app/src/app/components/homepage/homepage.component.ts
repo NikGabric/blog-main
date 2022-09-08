@@ -16,48 +16,57 @@ export class HomepageComponent implements OnInit {
       content:
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
       author: 'Test author 1',
+      comments: [],
     },
     {
       title: 'Test title 2',
       content: 'Test Content Y',
       author: 'Test author 1',
+      comments: [],
     },
     {
       title: 'Test title 42',
       content: 'Test Content X',
       author: 'Test author 2',
+      comments: [],
     },
     {
       title: 'Test title 1',
       content:
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
       author: 'Test author 1',
+      comments: [],
     },
     {
       title: 'Test title 2',
       content: 'Test Content Y',
       author: 'Test author 1',
+      comments: [],
     },
     {
       title: 'Test title 42',
       content: 'Test Content X',
       author: 'Test author 2',
+      comments: [],
     },
     {
       title: 'Test title 1',
       content:
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
       author: 'Test author 1',
+      comments: [],
     },
     {
       title: 'Test title 2',
       content: 'Test Content Y',
       author: 'Test author 1',
+      comments: [],
     },
     {
       title: 'Test title 42',
       content: 'Test Content X',
       author: 'Test author 2',
+      comments: [],
     },
   ];
 
@@ -73,6 +82,8 @@ export class HomepageComponent implements OnInit {
     }
     this.postsToDisplay = this.posts.slice(0, newLength);
   }
+
+  private getAllPosts() {}
 
   ngOnInit(): void {
     if (this.posts.length <= 3) this.enableShowMoreBtn = false;
