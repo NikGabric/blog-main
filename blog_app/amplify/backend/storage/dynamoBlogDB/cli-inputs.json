@@ -1,0 +1,14 @@
+{
+  "resourceName": "dynamoBlogDB",
+  "tableName": "dynamoBlogDB",
+  "partitionKey": {
+    "fieldName": "author",
+    "fieldType": "string"
+  },
+  "sortKey": {
+    "fieldName": "title",
+    "fieldType": "string"
+  },
+  "gsi": [],
+  "triggerFunctions": []
+}

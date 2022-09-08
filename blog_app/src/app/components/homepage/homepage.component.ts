@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import Amplify, { API } from 'aws-amplify';
 import { Post } from 'src/app/classes/post';
 
 @Component({
