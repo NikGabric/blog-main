@@ -2,7 +2,7 @@
   <div class="row justify-content-center">
     <div class="col-10 col-lg-6 col-sm-8 col-xl-6">
       <div class="card bg-light" style="border-radius: 0.5rem">
-        <div class="card-body text-center">
+        <div class="card-body text-center" *ngIf="!isConfirm">
           <h3>Register</h3>
 
           <form (ngSubmit)="register()">
@@ -79,6 +79,39 @@
               >Register
             </button>
           </form>
+        </div>
+        <div class="card-body" *ngIf="isConfirm">
+          <div class="row">
+            <div class="col mb-2">
+              <label for="code" class="form-label">Code:</label>
+              <input
+                type="text"
+                id="code"
+                name="code"
+                #code="ngModel"
+                [(ngModel)]="user.code"
+                class="form-control form-control-sm"
+              />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col d-grid">
+              <button
+                type="button"
+                (click)="confirmSignUp()"
+                class="btn btn-sm btn-success"
+                [disabled]="loading"
+              >
+                <span
+                  class="spinner-border spinner-border-sm"
+                  role="status"
+                  aria-hidden="true"
+                  *ngIf="loading"
+                ></span>
+                Confirm
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

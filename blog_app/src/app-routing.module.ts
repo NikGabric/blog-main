@@ -13,6 +13,7 @@ const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'home', component: HomepageComponent },
   { path: '', component: HomepageComponent },
+  { path: '**', component: HomepageComponent }, //wildcard route
 ];
 
 @NgModule({
