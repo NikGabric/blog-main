@@ -58,11 +58,6 @@
                 placeholder="Password"
                 [(ngModel)]="password2"
               />
-              <span
-                id="registerErrorPassword2"
-                style="display: none; color: red; text-align: left"
-                >Gesli se ne ujemata</span
-              >
               <label for="floatingInput">Repeat password</label>
             </div>
 
@@ -74,7 +69,15 @@
               * Password must be at least 8 characters long!
             </div>
 
-            <button type="submit" class="btn btn-primary">Register</button>
+            <button type="submit" class="btn btn-primary">
+              <span
+                class="spinner-border spinner-border-sm"
+                role="status"
+                aria-hidden="true"
+                *ngIf="loading"
+              ></span
+              >Register
+            </button>
           </form>
         </div>
       </div>

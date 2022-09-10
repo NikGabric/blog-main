@@ -6,7 +6,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from '../app-routing.module';
 import { AppComponent } from './app.component';
-import { AuthComponent } from './components/auth/auth.component';
+import { LoginComponent } from './components/login/login.component';
 import { HomepageComponent } from './components/homepage/homepage.component';
 import { CreatePostComponent } from './components/create-post/create-post.component';
 import { PostDetailsComponent } from './components/post-details/post-details.component';
@@ -15,7 +15,7 @@ import { RegisterComponent } from './components/register/register.component';
 @NgModule({
   declarations: [
     AppComponent,
-    AuthComponent,
+    LoginComponent,
     HomepageComponent,
     CreatePostComponent,
     PostDetailsComponent,
