@@ -1,12 +1,12 @@
 export type AmplifyDependentResourcesAttributes = {
     "function": {
-        "blogAppApiLamdbaF": {
+        "PostsHandler": {
             "Name": "string",
             "Arn": "string",
             "Region": "string",
             "LambdaExecutionRole": "string"
         },
-        "PostsHandler": {
+        "PostsHandlerNew": {
             "Name": "string",
             "Arn": "string",
             "Region": "string",
@@ -26,6 +26,11 @@ export type AmplifyDependentResourcesAttributes = {
     },
     "api": {
         "blogApi": {
+            "RootUrl": "string",
+            "ApiName": "string",
+            "ApiId": "string"
+        },
+        "blogApiNew": {
             "RootUrl": "string",
             "ApiName": "string",
             "ApiId": "string"

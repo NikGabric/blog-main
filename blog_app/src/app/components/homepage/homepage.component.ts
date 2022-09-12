@@ -1,6 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ComponentFactoryResolver, OnInit } from '@angular/core';
 import Amplify, { API } from 'aws-amplify';
 import { Post } from 'src/app/classes/post';
+
+const blogApi = 'blogApiNew';
+const apiPath = '/posts';
 
 @Component({
   selector: 'app-homepage',
@@ -70,6 +73,16 @@ export class HomepageComponent implements OnInit {
     },
   ];
 
+  private myInit = {
+    // OPTIONAL
+    headers: {}, // OPTIONAL
+    response: true, // OPTIONAL (return the entire Axios response object instead of only response.data)
+    queryStringParameters: {
+      // OPTIONAL
+      name: 'param',
+    },
+  };
+
   public postsToDisplay: Post[] = this.posts.slice(0, 3);
   public enableShowMoreBtn: boolean = true;
 
@@ -83,9 +96,15 @@ export class HomepageComponent implements OnInit {
     this.postsToDisplay = this.posts.slice(0, newLength);
   }
 
-  private getAllPosts() {}
+  private getAllPosts() {
+    const customerId = 1;
+    API.get(blogApi, apiPath, this.myInit).then((response) => {
+      console.log('API response', response);
+    });
+  }
 
   ngOnInit(): void {
     if (this.posts.length <= 3) this.enableShowMoreBtn = false;
+    this.getAllPosts();
   }
 }
