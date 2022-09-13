@@ -1,12 +1,6 @@
 export type AmplifyDependentResourcesAttributes = {
     "function": {
-        "PostsHandler": {
-            "Name": "string",
-            "Arn": "string",
-            "Region": "string",
-            "LambdaExecutionRole": "string"
-        },
-        "PostsHandlerNew": {
+        "blogApiHandler": {
             "Name": "string",
             "Arn": "string",
             "Region": "string",
@@ -29,15 +23,20 @@ export type AmplifyDependentResourcesAttributes = {
             "RootUrl": "string",
             "ApiName": "string",
             "ApiId": "string"
-        },
-        "blogApiNew": {
-            "RootUrl": "string",
-            "ApiName": "string",
-            "ApiId": "string"
         }
     },
     "storage": {
         "dynamoBlogDB": {
+            "Name": "string",
+            "Arn": "string",
+            "StreamArn": "string",
+            "PartitionKeyName": "string",
+            "PartitionKeyType": "string",
+            "SortKeyName": "string",
+            "SortKeyType": "string",
+            "Region": "string"
+        },
+        "dynamoBlog": {
             "Name": "string",
             "Arn": "string",
             "StreamArn": "string",

@@ -1,12 +1,6 @@
 {
   "function": {
-    "PostsHandler": {
-      "build": true,
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda",
-      "dependsOn": []
-    },
-    "PostsHandlerNew": {
+    "blogApiHandler": {
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda",
@@ -59,21 +53,7 @@
       "dependsOn": [
         {
           "category": "function",
-          "resourceName": "PostsHandler",
-          "attributes": [
-            "Name",
-            "Arn"
-          ]
-        }
-      ]
-    },
-    "blogApiNew": {
-      "service": "API Gateway",
-      "providerPlugin": "awscloudformation",
-      "dependsOn": [
-        {
-          "category": "function",
-          "resourceName": "PostsHandlerNew",
+          "resourceName": "blogApiHandler",
           "attributes": [
             "Name",
             "Arn"
@@ -84,6 +64,10 @@
   },
   "storage": {
     "dynamoBlogDB": {
+      "service": "DynamoDB",
+      "providerPlugin": "awscloudformation"
+    },
+    "dynamoBlog": {
       "service": "DynamoDB",
       "providerPlugin": "awscloudformation"
     }

@@ -1,0 +1,14 @@
+{
+  "resourceName": "dynamoBlog",
+  "tableName": "dynamoBlog",
+  "partitionKey": {
+    "fieldName": "id",
+    "fieldType": "string"
+  },
+  "sortKey": {
+    "fieldName": "title",
+    "fieldType": "string"
+  },
+  "gsi": [],
+  "triggerFunctions": []
+}

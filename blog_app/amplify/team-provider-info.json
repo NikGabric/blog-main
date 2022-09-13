@@ -18,13 +18,9 @@
         "blogapp": {}
       },
       "function": {
-        "PostsHandler": {
+        "blogApiHandler": {
           "deploymentBucketName": "amplify-blogapp-dev-135111-deployment",
-          "s3Key": "amplify-builds/PostsHandler-4132426257464950702b-build.zip"
-        },
-        "PostsHandlerNew": {
-          "deploymentBucketName": "amplify-blogapp-dev-135111-deployment",
-          "s3Key": "amplify-builds/PostsHandlerNew-563565616d72514c3979-build.zip"
+          "s3Key": "amplify-builds/blogApiHandler-4e694b6f4d4873374b32-build.zip"
         }
       }
     }
