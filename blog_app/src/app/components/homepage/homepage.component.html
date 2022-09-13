@@ -3,11 +3,7 @@
   <div class="list-group">
     <div class="m-3" *ngFor="let post of postsToDisplay">
       <a
-        [routerLink]="[
-          '/post-details',
-          post.author,
-          post.title.replaceAll(' ', '-')
-        ]"
+        [routerLink]="['/post-details', post.id]"
         class="list-group-item list-group-item-action"
         aria-current="true"
       >

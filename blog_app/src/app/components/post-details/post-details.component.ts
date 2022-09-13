@@ -13,16 +13,13 @@ const apiPath = '/posts';
 })
 export class PostDetailsComponent implements OnInit {
   constructor(private router: Router, public route: ActivatedRoute) {
-    this.postTitle = this.route.snapshot.paramMap.get('title');
-    this.postAuthor = this.route.snapshot.paramMap.get('author');
+    this.postId = this.route.snapshot.paramMap.get('postId');
     this.post = new Post();
-    this.apiPathWithTitle =
-      apiPath + '/' + this.postTitle?.replaceAll('-', ' ');
+    this.apiPathWithTitle = apiPath + '/' + this.postId;
   }
 
   public post: Post;
-  private postTitle: string | null;
-  private postAuthor: string | null;
+  private postId: string | null;
   private apiPathWithTitle: string;
 
   private async getPostData(): Promise<{}> {
@@ -30,6 +27,7 @@ export class PostDetailsComponent implements OnInit {
     const reqOptions = {
       Authorization: token,
     };
+    const id = this.route.snapshot.paramMap.get('postId');
 
     console.log(this.apiPathWithTitle);
 
