@@ -1,3 +1,19 @@
 {
-  "lambdaLayers": []
+  "lambdaLayers": [],
+  "permissions": {
+    "storage": {
+      "dynamoBlogDB": [
+        "create",
+        "read",
+        "update",
+        "delete"
+      ],
+      "dynamoBlog": [
+        "create",
+        "read",
+        "update",
+        "delete"
+      ]
+    }
+  }
 }

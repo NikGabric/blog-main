@@ -23,6 +23,22 @@
     "storagedynamoBlogDBArn": {
       "Type": "String",
       "Default": "storagedynamoBlogDBArn"
+    },
+    "storagedynamoBlogDBStreamArn": {
+      "Type": "String",
+      "Default": "storagedynamoBlogDBStreamArn"
+    },
+    "storagedynamoBlogName": {
+      "Type": "String",
+      "Default": "storagedynamoBlogName"
+    },
+    "storagedynamoBlogArn": {
+      "Type": "String",
+      "Default": "storagedynamoBlogArn"
+    },
+    "storagedynamoBlogStreamArn": {
+      "Type": "String",
+      "Default": "storagedynamoBlogStreamArn"
     }
   },
   "Conditions": {
@@ -77,6 +93,24 @@
             },
             "REGION": {
               "Ref": "AWS::Region"
+            },
+            "STORAGE_DYNAMOBLOGDB_NAME": {
+              "Ref": "storagedynamoBlogDBName"
+            },
+            "STORAGE_DYNAMOBLOGDB_ARN": {
+              "Ref": "storagedynamoBlogDBArn"
+            },
+            "STORAGE_DYNAMOBLOGDB_STREAMARN": {
+              "Ref": "storagedynamoBlogDBStreamArn"
+            },
+            "STORAGE_DYNAMOBLOG_NAME": {
+              "Ref": "storagedynamoBlogName"
+            },
+            "STORAGE_DYNAMOBLOG_ARN": {
+              "Ref": "storagedynamoBlogArn"
+            },
+            "STORAGE_DYNAMOBLOG_STREAMARN": {
+              "Ref": "storagedynamoBlogStreamArn"
             }
           }
         },
@@ -190,6 +224,91 @@
                     [
                       {
                         "Ref": "storagedynamoBlogDBArn"
+                      },
+                      "index/*"
+                    ]
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "AmplifyResourcesPolicy": {
+      "DependsOn": [
+        "LambdaExecutionRole"
+      ],
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "amplify-lambda-execution-policy",
+        "Roles": [
+          {
+            "Ref": "LambdaExecutionRole"
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:Put*",
+                "dynamodb:Create*",
+                "dynamodb:BatchWriteItem",
+                "dynamodb:Get*",
+                "dynamodb:BatchGetItem",
+                "dynamodb:List*",
+                "dynamodb:Describe*",
+                "dynamodb:Scan",
+                "dynamodb:Query",
+                "dynamodb:Update*",
+                "dynamodb:RestoreTable*",
+                "dynamodb:Delete*"
+              ],
+              "Resource": [
+                {
+                  "Ref": "storagedynamoBlogDBArn"
+                },
+                {
+                  "Fn::Join": [
+                    "/",
+                    [
+                      {
+                        "Ref": "storagedynamoBlogDBArn"
+                      },
+                      "index/*"
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:Put*",
+                "dynamodb:Create*",
+                "dynamodb:BatchWriteItem",
+                "dynamodb:Get*",
+                "dynamodb:BatchGetItem",
+                "dynamodb:List*",
+                "dynamodb:Describe*",
+                "dynamodb:Scan",
+                "dynamodb:Query",
+                "dynamodb:Update*",
+                "dynamodb:RestoreTable*",
+                "dynamodb:Delete*"
+              ],
+              "Resource": [
+                {
+                  "Ref": "storagedynamoBlogArn"
+                },
+                {
+                  "Fn::Join": [
+                    "/",
+                    [
+                      {
+                        "Ref": "storagedynamoBlogArn"
                       },
                       "index/*"
                     ]

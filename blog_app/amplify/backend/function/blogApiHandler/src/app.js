@@ -1,4 +1,13 @@
-/*
+/* Amplify Params - DO NOT EDIT
+	ENV
+	REGION
+	STORAGE_DYNAMOBLOGDB_ARN
+	STORAGE_DYNAMOBLOGDB_NAME
+	STORAGE_DYNAMOBLOGDB_STREAMARN
+	STORAGE_DYNAMOBLOG_ARN
+	STORAGE_DYNAMOBLOG_NAME
+	STORAGE_DYNAMOBLOG_STREAMARN
+Amplify Params - DO NOT EDIT */ /*
 Copyright 2017 - 2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the License. A copy of the License is located at
     http://aws.amazon.com/apache2.0/
@@ -10,12 +19,13 @@ const AWS = require("aws-sdk");
 const awsServerlessExpressMiddleware = require("aws-serverless-express/middleware");
 const bodyParser = require("body-parser");
 const express = require("express");
+const { v4: uuidv4 } = require("uuid");
 
 AWS.config.update({ region: process.env.TABLE_REGION });
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
-let tableName = "dynamoBlogDB";
+let tableName = "dynamoBlog";
 if (process.env.ENV && process.env.ENV !== "NONE") {
   tableName = tableName + "-" + process.env.ENV;
 }
@@ -111,11 +121,11 @@ app.get(path, function (request, response) {
  * HTTP Get method for get single object *
  *****************************************/
 
-app.get("/posts/:postTitle", function (request, response) {
+app.get("/posts/:postId", function (request, response) {
   let params = {
     TableName: tableName,
     Key: {
-      title: request.params.postTitle,
+      id: request.params.postId,
     },
   };
   dynamodb.get(params, (error, result) => {
@@ -207,25 +217,67 @@ app.put(path, function (req, res) {
  * HTTP post method for insert object *
  *************************************/
 
-app.post(path, function (req, res) {
-  if (userIdPresent) {
-    req.body["userId"] =
-      req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH;
-  }
+// app.post(path, function (req, res) {
+//   if (userIdPresent) {
+//     req.body["userId"] =
+//       req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH;
+//   }
 
-  let putItemParams = {
+//   let putItemParams = {
+//     TableName: tableName,
+//     Item: req.body,
+//   };
+//   dynamodb.put(putItemParams, (err, data) => {
+//     if (err) {
+//       res.statusCode = 500;
+//       res.json({ error: err, url: req.url, body: req.body });
+//     } else {
+//       res.json({ success: "post call succeed!", url: req.url, data: data });
+//     }
+//   });
+// });
+
+app.post("/posts", function (request, response) {
+  const timestamp = new Date().toISOString();
+  let params = {
     TableName: tableName,
-    Item: req.body,
+    Item: {
+      ...request.body,
+      id: uuidv4(), // auto-generate id
+      complete: false, // default for new todos
+      createdAt: timestamp,
+      updatedAt: timestamp,
+      userId: getUserId(request), // userId from request
+    },
   };
-  dynamodb.put(putItemParams, (err, data) => {
-    if (err) {
-      res.statusCode = 500;
-      res.json({ error: err, url: req.url, body: req.body });
+  dynamodb.put(params, (error, result) => {
+    if (error) {
+      response.json({
+        statusCode: 500,
+        error: error.message,
+        url: request.url,
+      });
     } else {
-      res.json({ success: "post call succeed!", url: req.url, data: data });
+      response.json({
+        statusCode: 200,
+        url: request.url,
+        body: JSON.stringify(params.Item),
+      });
     }
   });
 });
+
+const getUserId = (request) => {
+  try {
+    const reqContext = request.apiGateway.event.requestContext;
+    const authProvider = reqContext.identity.cognitoAuthenticationProvider;
+    return authProvider
+      ? authProvider.split(":CognitoSignIn:").pop()
+      : "UNAUTH";
+  } catch (error) {
+    return "UNAUTH";
+  }
+};
 
 /**************************************
  * HTTP remove method to delete object *
