@@ -1,8 +1,8 @@
-import { Component, ComponentFactoryResolver, OnInit } from '@angular/core';
-import Amplify, { API } from 'aws-amplify';
+import { Component, OnInit } from '@angular/core';
 import { Post } from 'src/app/classes/post';
+import { API, Auth } from 'aws-amplify';
 
-const blogApi = 'blogApiNew';
+const apiName = 'blogApi';
 const apiPath = '/posts';
 
 @Component({
@@ -13,82 +13,12 @@ const apiPath = '/posts';
 export class HomepageComponent implements OnInit {
   constructor() {}
 
-  public posts: Post[] = [
-    {
-      title: 'Test title 1',
-      content:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-      author: 'Test author 1',
-      comments: [],
-    },
-    {
-      title: 'Test title 2',
-      content: 'Test Content Y',
-      author: 'Test author 1',
-      comments: [],
-    },
-    {
-      title: 'Test title 42',
-      content: 'Test Content X',
-      author: 'Test author 2',
-      comments: [],
-    },
-    {
-      title: 'Test title 1',
-      content:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-      author: 'Test author 1',
-      comments: [],
-    },
-    {
-      title: 'Test title 2',
-      content: 'Test Content Y',
-      author: 'Test author 1',
-      comments: [],
-    },
-    {
-      title: 'Test title 42',
-      content: 'Test Content X',
-      author: 'Test author 2',
-      comments: [],
-    },
-    {
-      title: 'Test title 1',
-      content:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-      author: 'Test author 1',
-      comments: [],
-    },
-    {
-      title: 'Test title 2',
-      content: 'Test Content Y',
-      author: 'Test author 1',
-      comments: [],
-    },
-    {
-      title: 'Test title 42',
-      content: 'Test Content X',
-      author: 'Test author 2',
-      comments: [],
-    },
-  ];
-
-  private myInit = {
-    // OPTIONAL
-    headers: {}, // OPTIONAL
-    response: true, // OPTIONAL (return the entire Axios response object instead of only response.data)
-    queryStringParameters: {
-      // OPTIONAL
-      name: 'param',
-    },
-  };
-
-  public postsToDisplay: Post[] = this.posts.slice(0, 3);
+  public posts: Post[] = [];
+  public postsToDisplay: Post[] = [];
   public enableShowMoreBtn: boolean = true;
 
-  public showMore() {
+  public showMore(): void {
     let newLength = this.postsToDisplay.length + 3;
-
     if (newLength >= this.posts.length) {
       newLength = this.posts.length;
       this.enableShowMoreBtn = false;
@@ -96,15 +26,25 @@ export class HomepageComponent implements OnInit {
     this.postsToDisplay = this.posts.slice(0, newLength);
   }
 
-  private getAllPosts() {
-    const customerId = 1;
-    API.get(blogApi, apiPath, this.myInit).then((response) => {
-      console.log('API response', response);
-    });
+  public async getAllPosts(): Promise<void> {
+    const token = (await Auth.currentSession()).getIdToken().getJwtToken();
+    const reqOptions = {
+      Authorization: token,
+    };
+
+    API.get(apiName, apiPath, reqOptions)
+      .then((result) => {
+        this.posts = JSON.parse(result.body);
+        console.log('Posts: ', this.posts);
+        this.postsToDisplay = this.posts.slice(0, 3);
+      })
+      .catch((err) => {
+        console.log('Error: ', err);
+      });
   }
 
-  ngOnInit(): void {
-    if (this.posts.length <= 3) this.enableShowMoreBtn = false;
+  async ngOnInit(): Promise<void> {
+    // if (this.posts.length <= 3) this.enableShowMoreBtn = false;
     this.getAllPosts();
   }
 }
