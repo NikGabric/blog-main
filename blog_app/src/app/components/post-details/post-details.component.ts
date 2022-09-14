@@ -47,7 +47,12 @@ export class PostDetailsComponent implements OnInit {
   public commentDataAvailable: boolean;
 
   private async getPostData(): Promise<void> {
-    const token = (await Auth.currentSession()).getIdToken().getJwtToken();
+    var token: string | null;
+    try {
+      token = (await Auth.currentSession()).getIdToken().getJwtToken();
+    } catch (e) {
+      token = null;
+    }
     const reqOptions = {
       Authorization: token,
     };
@@ -92,7 +97,12 @@ export class PostDetailsComponent implements OnInit {
   }
 
   private async getComments(): Promise<void> {
-    const token = (await Auth.currentSession()).getIdToken().getJwtToken();
+    var token: string | null;
+    try {
+      token = (await Auth.currentSession()).getIdToken().getJwtToken();
+    } catch (e) {
+      token = null;
+    }
     const reqOptions = {
       Authorization: token,
     };

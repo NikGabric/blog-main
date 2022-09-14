@@ -27,7 +27,12 @@ export class HomepageComponent implements OnInit {
   }
 
   public async getAllPosts(): Promise<void> {
-    const token = (await Auth.currentSession()).getIdToken().getJwtToken();
+    var token: string | null;
+    try {
+      token = (await Auth.currentSession()).getIdToken().getJwtToken();
+    } catch (e) {
+      token = null;
+    }
     const reqOptions = {
       Authorization: token,
     };
