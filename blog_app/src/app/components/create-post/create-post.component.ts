@@ -36,7 +36,7 @@ export class CreatePostComponent implements OnInit {
   public async createPost(): Promise<void> {
     const token = (await Auth.currentSession()).getIdToken().getJwtToken();
     const user = await this.cognitoService.getUser();
-    this.postParams.title = 'POST#' + this.postParams.title;
+    this.postParams.postTitle = this.postParams.title;
     this.postParams.author = user.username;
     this.postParams.comments = [];
 

@@ -11,11 +11,14 @@ const apiPath = '/posts';
   styleUrls: ['./homepage.component.scss'],
 })
 export class HomepageComponent implements OnInit {
-  constructor() {}
+  constructor() {
+    this.loading = true;
+  }
 
   public posts: Post[] = [];
   public postsToDisplay: Post[] = [];
   public enableShowMoreBtn: boolean = true;
+  public loading: boolean;
 
   public showMore(): void {
     let newLength = this.postsToDisplay.length + 3;
@@ -42,6 +45,7 @@ export class HomepageComponent implements OnInit {
         this.posts = JSON.parse(result.body);
         console.log('Posts: ', this.posts);
         this.postsToDisplay = this.posts.slice(0, 3);
+        this.loading = false;
       })
       .catch((err) => {
         console.log('Error: ', err);

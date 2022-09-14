@@ -1,6 +1,15 @@
 <div class="p-3 container col-md-6">
   <div class="p-3 d-md-flex justify-content-md-center"><h2>BlogShite</h2></div>
   <div class="list-group">
+    <div class="p-3 d-md-flex justify-content-md-center">
+      <span
+        class="spinner-border spinner-border-sm"
+        role="status"
+        aria-hidden="true"
+        *ngIf="loading"
+      ></span>
+    </div>
+
     <div class="m-3" *ngFor="let post of postsToDisplay">
       <a
         [routerLink]="[
@@ -12,7 +21,7 @@
         aria-current="true"
       >
         <div class="d-flex w-100 justify-content-between">
-          <h5 class="mb-1">{{ post.title.replace("POST#", "") }}</h5>
+          <h5 class="mb-1">{{ post.postTitle }}</h5>
           <small>{{
             post.updatedAt.replace("T", " - ").replace("Z", "")
           }}</small>

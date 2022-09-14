@@ -6,15 +6,39 @@
   <div class="row">
     <div class="col-md-12">
       <div class="post-content">
+        <div class="p-3 d-md-flex justify-content-md-center">
+          <span
+            class="spinner-border spinner-border-sm"
+            role="status"
+            aria-hidden="true"
+            *ngIf="loading"
+          ></span>
+        </div>
         <div class="post-container">
           <div class="post-detail" *ngIf="postDataAvailable">
             <div class="post-info">
-              <h5>
-                <a>{{ post.title.replace("POST#", "") }}</a>
-              </h5>
-              <button class="btn btn-primary m-1" (click)="deletePost()">
-                Delete this post
-              </button>
+              <div class="row">
+                <div class="col-md-8">
+                  <h5>
+                    <a>{{ post.postTitle }}</a>
+                  </h5>
+                </div>
+                <div class="col-md-4">
+                  <button class="btn btn-primary m-1" (click)="deletePost()">
+                    Delete this post
+                  </button>
+                  <button
+                    class="btn btn-primary m-1"
+                    [routerLink]="[
+                      '/edit-post',
+                      post.title.replace('POST#', ''),
+                      post.id
+                    ]"
+                  >
+                    Edit this post
+                  </button>
+                </div>
+              </div>
               <p class="text-muted">
                 {{ post.updatedAt }}
                 <b>by user: </b>
@@ -22,15 +46,16 @@
               </p>
             </div>
             <div class="line-divider"></div>
-            <div class="post-text">
+            <div class="post-text d-flex flex-start">
               <p>
                 {{ post.content }}
               </p>
             </div>
+            <hr />
             <div class="line-divider"></div>
             <div class="post-comment" *ngFor="let comment of comments">
               <div class="comment-text">
-                <span>{{ comment.content }}</span>
+                <div>{{ comment.content }}</div>
                 <p class="text-muted">
                   {{ comment.updatedAt.replace("T", " ").replace("Z", " ") }}
                   <b>by user: </b>

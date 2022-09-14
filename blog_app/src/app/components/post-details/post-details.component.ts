@@ -29,7 +29,11 @@ export class PostDetailsComponent implements OnInit {
 
     this.comments = [];
     this.commentDataAvailable = false;
+
+    this.loading = true;
   }
+
+  public loading: boolean;
 
   // Data for getting post from DB
   public post: Post;
@@ -62,6 +66,7 @@ export class PostDetailsComponent implements OnInit {
         this.post = JSON.parse(result.body);
         this.postDataAvailable = true;
         console.log(this.post);
+        this.loading = false;
       })
       .catch((err) => {
         console.log('Error: ', err);

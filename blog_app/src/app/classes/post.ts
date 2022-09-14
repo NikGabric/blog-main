@@ -1,9 +1,10 @@
 export class Post {
   'title': string;
   'content': string;
+  'postTitle': string;
   'author': string;
   'comments': [];
-  'id': string;
+  'id': string | null;
   'createdAt': string;
   'updatedAt': string;
 }

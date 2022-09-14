@@ -5,9 +5,11 @@ import { CreatePostComponent } from './app/components/create-post/create-post.co
 import { HomepageComponent } from './app/components/homepage/homepage.component';
 import { PostDetailsComponent } from './app/components/post-details/post-details.component';
 import { RegisterComponent } from './app/components/register/register.component';
+import { EditPostComponent } from './app/components/edit-post/edit-post.component';
 
 const routes: Routes = [
   { path: 'post-details/:postTitle/:postId', component: PostDetailsComponent },
+  { path: 'edit-post/:postTitle/:postId', component: EditPostComponent },
   { path: 'create-post', component: CreatePostComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },
