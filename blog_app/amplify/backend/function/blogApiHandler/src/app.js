@@ -108,6 +108,37 @@ app.get(path, function (request, response) {
     if (error) {
       response.json({ statusCode: 500, error: error.message });
     } else {
+      for (var i = 0; i < result.Items.length; i++) {
+        if (result.Items[i].title.startsWith("COMMENT#"))
+          result.Items.splice(i, 1);
+      }
+      response.json({
+        statusCode: 200,
+        url: request.url,
+        body: JSON.stringify(result.Items),
+      });
+    }
+  });
+});
+
+app.get("/posts/comments/:postId", function (request, response) {
+  let params = {
+    TableName: tableName,
+    KeyConditionExpression: "#pk= :pk And begins_with(#sk, :sk)",
+    ExpressionAttributeValues: {
+      ":pk": request.params.postId,
+      ":sk": "COMMENT#",
+    },
+    ExpressionAttributeNames: {
+      "#pk": "id",
+      "#sk": "title",
+    },
+    limit: 100,
+  };
+  dynamodb.query(params, (error, result) => {
+    if (error) {
+      response.json({ statusCode: 500, error: error.message });
+    } else {
       response.json({
         statusCode: 200,
         url: request.url,
@@ -121,11 +152,12 @@ app.get(path, function (request, response) {
  * HTTP Get method for get single object *
  *****************************************/
 
-app.get("/posts/:postId", function (request, response) {
+app.get("/posts/:postTitle/:postId", function (request, response) {
   let params = {
     TableName: tableName,
     Key: {
       id: request.params.postId,
+      title: "POST#" + request.params.postTitle,
     },
   };
   dynamodb.get(params, (error, result) => {
@@ -244,7 +276,38 @@ app.post("/posts", function (request, response) {
     Item: {
       ...request.body,
       id: uuidv4(), // auto-generate id
-      complete: false, // default for new todos
+      complete: false,
+      createdAt: timestamp,
+      updatedAt: timestamp,
+      userId: getUserId(request), // userId from request
+    },
+  };
+  dynamodb.put(params, (error, result) => {
+    if (error) {
+      response.json({
+        statusCode: 500,
+        error: error.message,
+        url: request.url,
+      });
+    } else {
+      response.json({
+        statusCode: 200,
+        url: request.url,
+        body: JSON.stringify(params.Item),
+      });
+    }
+  });
+});
+
+app.post("/posts/comment/:postId", function (request, response) {
+  const timestamp = new Date().toISOString();
+  let params = {
+    TableName: tableName,
+    Item: {
+      ...request.body,
+      id: request.params.postId,
+      title: "COMMENT#" + uuidv4(),
+      complete: false,
       createdAt: timestamp,
       updatedAt: timestamp,
       userId: getUserId(request), // userId from request
