@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Post } from 'src/app/classes/post';
 import { API, Auth } from 'aws-amplify';
-import { Router, ActivatedRoute } from '@angular/router';
-import { JsonPipe } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
+import { CognitoService } from 'src/app/services/cognito.service';
+import { Comment } from 'src/app/classes/comment';
 
 const apiName = 'blogApi';
 const apiPath = '/posts';
@@ -13,39 +14,122 @@ const apiPath = '/posts';
   styleUrls: ['./post-details.component.scss'],
 })
 export class PostDetailsComponent implements OnInit {
-  constructor(private router: Router, public route: ActivatedRoute) {
+  constructor(
+    public route: ActivatedRoute,
+    public cognitoService: CognitoService
+  ) {
+    this.post = new Post();
     this.postId = this.route.snapshot.paramMap.get('postId');
     this.postTitle = this.route.snapshot.paramMap.get('postTitle');
-    this.post = new Post();
     this.apiPathWithId = apiPath + '/' + this.postTitle + '/' + this.postId;
+    this.postDataAvailable = false;
+    this.allowComments = false;
+
+    this.commentParams = new Comment();
+
+    this.comments = [];
+    this.commentDataAvailable = false;
   }
 
+  // Data for getting post from DB
   public post: Post;
   private postId: string | null;
   private postTitle: string | null;
   private apiPathWithId: string;
+  public postDataAvailable: boolean;
+  public allowComments: boolean;
 
-  private async getPostData(): Promise<{}> {
+  // Data for commenting
+  public commentParams: Comment;
+
+  // Data for showing comments
+  public comments: Comment[];
+  public commentDataAvailable: boolean;
+
+  private async getPostData(): Promise<void> {
     const token = (await Auth.currentSession()).getIdToken().getJwtToken();
     const reqOptions = {
       Authorization: token,
     };
 
-    console.log(this.apiPathWithId);
-
     await API.get(apiName, this.apiPathWithId, reqOptions)
       .then((result) => {
         this.post = JSON.parse(result.body);
+        this.postDataAvailable = true;
         console.log(this.post);
       })
       .catch((err) => {
         console.log('Error: ', err);
       });
-
-    return {};
   }
 
-  ngOnInit(): void {
-    this.getPostData();
+  public async commentOnPost(): Promise<void> {
+    const token = (await Auth.currentSession()).getIdToken().getJwtToken();
+    const commenter = await this.cognitoService.getUser();
+    this.commentParams.author = commenter.username;
+    this.commentParams.userId = commenter.attributes.sub;
+    this.commentParams.upvotes = 0;
+    this.commentParams.downvotes = 0;
+    const reqOptions = {
+      Authorization: token,
+      body: this.commentParams,
+    };
+    const apiPathCommentCreation = apiPath + '/comment/' + this.postId;
+
+    console.log('Comment parameters: ' + this.commentParams);
+    console.log(apiPathCommentCreation);
+
+    API.post(apiName, apiPathCommentCreation, reqOptions)
+      .then((result) => {
+        console.log(result);
+        this.commentParams = new Comment();
+        this.commentDataAvailable = true;
+        this.getComments();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  private async getComments(): Promise<void> {
+    const token = (await Auth.currentSession()).getIdToken().getJwtToken();
+    const reqOptions = {
+      Authorization: token,
+    };
+
+    const apiPathComents = apiPath + '/comments/' + this.postId;
+    console.log(apiPathComents);
+
+    await API.get(apiName, apiPathComents, reqOptions)
+      .then((result) => {
+        this.comments = JSON.parse(result.body);
+        this.commentDataAvailable = true;
+        console.log(this.comments);
+      })
+      .catch((err) => {
+        console.log('Error: ', err);
+      });
+  }
+
+  public async deletePost(): Promise<void> {
+    console.log('delete');
+
+    const apiPathDelete = apiPath + '/' + this.postId;
+    console.log(apiPathDelete);
+
+    await API.del(apiName, apiPathDelete, {})
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  async ngOnInit(): Promise<void> {
+    this.allowComments = await this.cognitoService.isAuthenticated();
+    this.getPostData().then(() => {
+      this.getComments();
+    });
   }
 }
