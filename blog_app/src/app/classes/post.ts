@@ -4,4 +4,6 @@ export class Post {
   'author': string;
   'comments': [];
   'id': string;
+  'createdAt': string;
+  'updatedAt': string;
 }

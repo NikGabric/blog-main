@@ -7,7 +7,7 @@ import { PostDetailsComponent } from './app/components/post-details/post-details
 import { RegisterComponent } from './app/components/register/register.component';
 
 const routes: Routes = [
-  { path: 'post-details/:postId', component: PostDetailsComponent },
+  { path: 'post-details/:postTitle/:postId', component: PostDetailsComponent },
   { path: 'create-post', component: CreatePostComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },
