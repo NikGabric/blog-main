@@ -109,8 +109,10 @@ app.get(path, function (request, response) {
       response.json({ statusCode: 500, error: error.message });
     } else {
       for (var i = 0; i < result.Items.length; i++) {
-        if (result.Items[i].title.startsWith("COMMENT#"))
+        if (result.Items[i].title.startsWith("COMMENT#")) {
           result.Items.splice(i, 1);
+          i--;
+        }
       }
       response.json({
         statusCode: 200,
