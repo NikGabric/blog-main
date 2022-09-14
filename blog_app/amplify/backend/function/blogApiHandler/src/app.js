@@ -227,22 +227,47 @@ app.get("/posts/:postTitle/:postId", function (request, response) {
  * HTTP put method for insert object *
  *************************************/
 
-app.put(path, function (req, res) {
-  if (userIdPresent) {
-    req.body["userId"] =
-      req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH;
-  }
-
-  let putItemParams = {
+app.put("/posts", function (request, response) {
+  const timestamp = new Date().toISOString();
+  const params = {
     TableName: tableName,
-    Item: req.body,
+    Key: {
+      id: request.body.id,
+      title: request.body.oldPostTitle,
+    },
+    ExpressionAttributeNames: {
+      "#postTitle": "postTitle",
+      "#content": "content",
+    },
+    ExpressionAttributeValues: {},
+    ReturnValues: "UPDATED_NEW",
   };
-  dynamodb.put(putItemParams, (err, data) => {
-    if (err) {
-      res.statusCode = 500;
-      res.json({ error: err, url: req.url, body: req.body });
+  params.UpdateExpression = "SET ";
+  if (request.body.postTitle) {
+    params.ExpressionAttributeValues[":postTitle"] = request.body.postTitle;
+    params.UpdateExpression += "#postTitle = :postTitle, ";
+  }
+  if (request.body.content) {
+    params.ExpressionAttributeValues[":content"] = request.body.content;
+    params.UpdateExpression += "#content = :content, ";
+  }
+  if (request.body.title || request.body.content) {
+    params.ExpressionAttributeValues[":updatedAt"] = timestamp;
+    params.UpdateExpression += "updatedAt = :updatedAt";
+  }
+  dynamodb.update(params, (error, result) => {
+    if (error) {
+      response.json({
+        statusCode: 500,
+        error: error.message,
+        url: request.url,
+      });
     } else {
-      res.json({ success: "put call succeed!", url: req.url, data: data });
+      response.json({
+        statusCode: 200,
+        url: request.url,
+        body: JSON.stringify(result.Attributes),
+      });
     }
   });
 });
@@ -273,6 +298,7 @@ app.put(path, function (req, res) {
 
 app.post("/posts", function (request, response) {
   const timestamp = new Date().toISOString();
+  request.body.title = "POST#" + request.body.title;
   let params = {
     TableName: tableName,
     Item: {
