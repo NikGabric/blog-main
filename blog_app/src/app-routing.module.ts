@@ -18,7 +18,6 @@ const routes: Routes = [
   { path: 'create-post', component: CreatePostComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },
-  { path: 'home', component: HomepageComponent },
   { path: '', component: HomepageComponent },
   { path: '**', component: HomepageComponent }, //wildcard route
 ];

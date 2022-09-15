@@ -23,7 +23,7 @@ export class LoginComponent {
       .signIn(this.user)
       .then(() => {
         this.loading = false;
-        this.router.navigate(['/home']);
+        this.router.navigate(['/']);
       })
       .catch(() => {
         this.loading = false;
