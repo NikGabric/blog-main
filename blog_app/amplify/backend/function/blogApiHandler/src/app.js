@@ -67,38 +67,6 @@ const convertUrlType = (param, type) => {
  * HTTP Get method for list objects *
  ********************************/
 
-// app.get(path + hashKeyPath, function(req, res) {
-//   const condition = {}
-//   condition[partitionKeyName] = {
-//     ComparisonOperator: 'EQ'
-//   }
-
-//   if (userIdPresent && req.apiGateway) {
-//     condition[partitionKeyName]['AttributeValueList'] = [req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH ];
-//   } else {
-//     try {
-//       condition[partitionKeyName]['AttributeValueList'] = [ convertUrlType(req.params[partitionKeyName], partitionKeyType) ];
-//     } catch(err) {
-//       res.statusCode = 500;
-//       res.json({error: 'Wrong column type ' + err});
-//     }
-//   }
-
-//   let queryParams = {
-//     TableName: tableName,
-//     KeyConditions: condition
-//   }
-
-//   dynamodb.query(queryParams, (err, data) => {
-//     if (err) {
-//       res.statusCode = 500;
-//       res.json({error: 'Could not load items: ' + err});
-//     } else {
-//       res.json(data.Items);
-//     }
-//   });
-// });
-
 app.get(path, function (request, response) {
   let params = {
     TableName: tableName,
@@ -175,83 +143,90 @@ app.get("/posts/:postTitle/:postId", function (request, response) {
   });
 });
 
-// app.get(path + "/object" + hashKeyPath + sortKeyPath, function (req, res) {
-//   const params = {};
-//   if (userIdPresent && req.apiGateway) {
-//     params[partitionKeyName] =
-//       req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH;
-//   } else {
-//     params[partitionKeyName] = req.params[partitionKeyName];
-//     try {
-//       params[partitionKeyName] = convertUrlType(
-//         req.params[partitionKeyName],
-//         partitionKeyType
-//       );
-//     } catch (err) {
-//       res.statusCode = 500;
-//       res.json({ error: "Wrong column type " + err });
-//     }
-//   }
-//   if (hasSortKey) {
-//     try {
-//       params[sortKeyName] = convertUrlType(
-//         req.params[sortKeyName],
-//         sortKeyType
-//       );
-//     } catch (err) {
-//       res.statusCode = 500;
-//       res.json({ error: "Wrong column type " + err });
-//     }
-//   }
-
-//   let getItemParams = {
-//     TableName: tableName,
-//     Key: params,
-//   };
-
-//   dynamodb.get(getItemParams, (err, data) => {
-//     if (err) {
-//       res.statusCode = 500;
-//       res.json({ error: "Could not load items: " + err.message });
-//     } else {
-//       if (data.Item) {
-//         res.json(data.Item);
-//       } else {
-//         res.json(data);
-//       }
-//     }
-//   });
-// });
-
 /************************************
  * HTTP put method for insert object *
  *************************************/
 
 app.put("/posts", function (request, response) {
-  const timestamp = new Date().toISOString();
+  if (getUserId(request) === request.body.userId) {
+    const timestamp = new Date().toISOString();
+    const params = {
+      TableName: tableName,
+      Key: {
+        id: request.body.id,
+        title: request.body.oldPostTitle,
+      },
+      ExpressionAttributeNames: {
+        "#postTitle": "postTitle",
+        "#content": "content",
+      },
+      ExpressionAttributeValues: {},
+      ReturnValues: "UPDATED_NEW",
+    };
+    params.UpdateExpression = "SET ";
+    if (request.body.postTitle) {
+      params.ExpressionAttributeValues[":postTitle"] = request.body.postTitle;
+      params.UpdateExpression += "#postTitle = :postTitle, ";
+    }
+    if (request.body.content) {
+      params.ExpressionAttributeValues[":content"] = request.body.content;
+      params.UpdateExpression += "#content = :content, ";
+    }
+    if (request.body.title || request.body.content) {
+      params.ExpressionAttributeValues[":updatedAt"] = timestamp;
+      params.UpdateExpression += "updatedAt = :updatedAt";
+    }
+    dynamodb.update(params, (error, result) => {
+      if (error) {
+        response.json({
+          statusCode: 500,
+          error: error.message,
+          url: request.url,
+        });
+      } else {
+        response.json({
+          statusCode: 200,
+          url: request.url,
+          body: JSON.stringify(result.Attributes),
+        });
+      }
+    });
+  } else {
+    response.json({
+      statusCode: 403,
+      url: request.url,
+      error: "Forbidden",
+      reqId: request.body.userId,
+      getUserId: getUserId(request),
+    });
+  }
+});
+
+// upvoting a comment
+app.put("/posts", function (request, response) {
   const params = {
     TableName: tableName,
     Key: {
       id: request.body.id,
-      title: request.body.oldPostTitle,
+      title: request.body.title,
     },
     ExpressionAttributeNames: {
-      "#postTitle": "postTitle",
-      "#content": "content",
+      "#upvotes": "upvotes",
+      "#downvotes": "downvotes",
     },
     ExpressionAttributeValues: {},
     ReturnValues: "UPDATED_NEW",
   };
   params.UpdateExpression = "SET ";
-  if (request.body.postTitle) {
-    params.ExpressionAttributeValues[":postTitle"] = request.body.postTitle;
-    params.UpdateExpression += "#postTitle = :postTitle, ";
+  if (request.body.upvote) {
+    params.ExpressionAttributeValues[":text"] = request.body.text;
+    params.UpdateExpression += "#text = :text, ";
   }
-  if (request.body.content) {
-    params.ExpressionAttributeValues[":content"] = request.body.content;
-    params.UpdateExpression += "#content = :content, ";
+  if (request.body.complete) {
+    params.ExpressionAttributeValues[":downvotes"] = request.body.complete;
+    params.UpdateExpression += "downvotes = :downvotes, ";
   }
-  if (request.body.title || request.body.content) {
+  if (request.body.text || request.body.complete) {
     params.ExpressionAttributeValues[":updatedAt"] = timestamp;
     params.UpdateExpression += "updatedAt = :updatedAt";
   }
@@ -275,26 +250,6 @@ app.put("/posts", function (request, response) {
 /************************************
  * HTTP post method for insert object *
  *************************************/
-
-// app.post(path, function (req, res) {
-//   if (userIdPresent) {
-//     req.body["userId"] =
-//       req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH;
-//   }
-
-//   let putItemParams = {
-//     TableName: tableName,
-//     Item: req.body,
-//   };
-//   dynamodb.put(putItemParams, (err, data) => {
-//     if (err) {
-//       res.statusCode = 500;
-//       res.json({ error: err, url: req.url, body: req.body });
-//     } else {
-//       res.json({ success: "post call succeed!", url: req.url, data: data });
-//     }
-//   });
-// });
 
 app.post("/posts", function (request, response) {
   const timestamp = new Date().toISOString();
@@ -329,12 +284,13 @@ app.post("/posts", function (request, response) {
 
 app.post("/posts/comment/:postId", function (request, response) {
   const timestamp = new Date().toISOString();
+  const commentId = uuidv4();
   let params = {
     TableName: tableName,
     Item: {
       ...request.body,
       id: request.params.postId,
-      title: "COMMENT#" + uuidv4(),
+      title: "COMMENT#" + commentId,
       complete: false,
       createdAt: timestamp,
       updatedAt: timestamp,
@@ -397,49 +353,6 @@ app.delete("/posts/:postId", function (request, response) {
     }
   });
 });
-
-// app.delete(path + "/object" + hashKeyPath + sortKeyPath, function (req, res) {
-//   const params = {};
-//   if (userIdPresent && req.apiGateway) {
-//     params[partitionKeyName] =
-//       req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH;
-//   } else {
-//     params[partitionKeyName] = req.params[partitionKeyName];
-//     try {
-//       params[partitionKeyName] = convertUrlType(
-//         req.params[partitionKeyName],
-//         partitionKeyType
-//       );
-//     } catch (err) {
-//       res.statusCode = 500;
-//       res.json({ error: "Wrong column type " + err });
-//     }
-//   }
-//   if (hasSortKey) {
-//     try {
-//       params[sortKeyName] = convertUrlType(
-//         req.params[sortKeyName],
-//         sortKeyType
-//       );
-//     } catch (err) {
-//       res.statusCode = 500;
-//       res.json({ error: "Wrong column type " + err });
-//     }
-//   }
-
-//   let removeItemParams = {
-//     TableName: tableName,
-//     Key: params,
-//   };
-//   dynamodb.delete(removeItemParams, (err, data) => {
-//     if (err) {
-//       res.statusCode = 500;
-//       res.json({ error: err, url: req.url });
-//     } else {
-//       res.json({ url: req.url, data: data });
-//     }
-//   });
-// });
 
 app.listen(3000, function () {
   console.log("App started");
