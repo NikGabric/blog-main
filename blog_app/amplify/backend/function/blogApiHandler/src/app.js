@@ -508,7 +508,10 @@ app.delete("/posts/deletePost/:postId", async function (request, response) {
 });
 
 app.delete("/posts/deleteComment", async function (request, response) {
-  if (getUserId(request) === request.body.userId) {
+  if (
+    getUserId(request) === request.body.userId ||
+    getUserId(request) === request.body.postUserId
+  ) {
     let params = {
       TableName: tableName,
       Key: {
