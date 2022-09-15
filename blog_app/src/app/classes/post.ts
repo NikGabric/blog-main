@@ -7,4 +7,5 @@ export class Post {
   'id': string | null;
   'createdAt': string;
   'updatedAt': string;
+  'userId': string;
 }

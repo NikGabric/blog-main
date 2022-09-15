@@ -22,9 +22,7 @@
       >
         <div class="d-flex w-100 justify-content-between">
           <h5 class="mb-1">{{ post.postTitle }}</h5>
-          <small>{{
-            post.updatedAt.replace("T", " - ").replace("Z", "")
-          }}</small>
+          <small>{{ post.updatedAt.substring(0, 10) }}</small>
         </div>
         <p class="mb-1">{{ post.content }}</p>
         <small>{{ post.author }}</small>

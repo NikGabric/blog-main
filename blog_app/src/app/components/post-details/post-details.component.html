@@ -46,21 +46,38 @@
               </p>
             </div>
             <div class="line-divider"></div>
-            <div class="post-text d-flex flex-start">
+            <div
+              class="post-text d-flex flex-start"
+              style="white-space: pre-line"
+            >
               <p>
                 {{ post.content }}
               </p>
             </div>
             <hr />
             <div class="line-divider"></div>
-            <div class="post-comment" *ngFor="let comment of comments">
-              <div class="comment-text">
-                <div>{{ comment.content }}</div>
-                <p class="text-muted">
-                  {{ comment.updatedAt.replace("T", " ").replace("Z", " ") }}
-                  <b>by user: </b>
-                  {{ comment.author }}
-                </p>
+            <div class="" *ngFor="let comment of comments">
+              <div class="row">
+                <div class="col-md-10">
+                  <a>{{ comment.content }}</a>
+                  <p class="text-muted">
+                    {{ comment.updatedAt }}
+                    <b>by user: </b>
+                    {{ comment.author }}
+                  </p>
+                  <p>
+                    <span class="fa fa-arrow-up vote up"> </span>
+                    <span class="vote-count">
+                      {{ comment.upvotes - comment.downvotes }}
+                    </span>
+                    <span class="fa fa-arrow-down vote down"> </span>
+                  </p>
+                </div>
+                <div class="col-md-2 p-2">
+                  <button class="btn btn-primary m-1">Delete</button>
+                  <button class="btn btn-primary m-1">Edit</button>
+                </div>
+                <hr />
               </div>
             </div>
             <form
