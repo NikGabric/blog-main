@@ -29,6 +29,7 @@ export class PostDetailsComponent implements OnInit {
     this.allowComments = false;
 
     this.commentParams = new Comment();
+    this.allowPostEdit = false;
 
     this.comments = [];
     this.commentDataAvailable = false;
@@ -37,6 +38,7 @@ export class PostDetailsComponent implements OnInit {
   }
 
   public loading: boolean;
+  public allowPostEdit: boolean;
 
   // Data for getting post from DB
   public post: Post;
@@ -72,6 +74,7 @@ export class PostDetailsComponent implements OnInit {
         this.post = JSON.parse(result.body);
         this.postDataAvailable = true;
         this.loading = false;
+        if (user.attributes.sub === this.post.userId) this.allowPostEdit = true;
       })
       .catch((err) => {
         console.log('Error: ', err);
@@ -104,10 +107,13 @@ export class PostDetailsComponent implements OnInit {
 
   private async getComments(): Promise<void> {
     var token: string | null;
+    var user: any;
     try {
       token = (await Auth.currentSession()).getIdToken().getJwtToken();
+      user = await this.cognitoService.getUser();
     } catch (e) {
       token = null;
+      user = null;
     }
     const reqOptions = {
       Authorization: token,
@@ -120,6 +126,9 @@ export class PostDetailsComponent implements OnInit {
         this.comments = JSON.parse(result.body).sort(
           (objA: Comment, objB: Comment) => objB.upvotes - objA.upvotes
         );
+        this.comments.forEach((comment) => {
+          if (user.attributes.sub === comment.userId) comment.allowEdit = true;
+        });
         this.commentDataAvailable = true;
       })
       .catch((err) => {

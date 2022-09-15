@@ -23,7 +23,7 @@
                     <a>{{ post.postTitle }}</a>
                   </h5>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-4" *ngIf="allowPostEdit">
                   <button class="btn btn-primary m-1" (click)="deletePost()">
                     Delete this post
                   </button>
@@ -88,7 +88,7 @@
                     >
                   </p>
                 </div>
-                <div class="col-md-2 p-2">
+                <div class="col-md-2 p-2" *ngIf="comment.allowEdit">
                   <button
                     class="btn btn-primary m-1"
                     (click)="deleteComment(comment.title, comment.userId)"

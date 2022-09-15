@@ -8,4 +8,5 @@ export class Comment {
   'updatedAt': string;
   'upvotes': number;
   'downvotes': number;
+  'allowEdit': boolean;
 }
