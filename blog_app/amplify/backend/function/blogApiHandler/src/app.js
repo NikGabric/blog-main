@@ -330,25 +330,58 @@ const getUserId = (request) => {
  * HTTP remove method to delete object *
  ***************************************/
 
-app.delete("/posts/:postId", function (request, response) {
+app.delete("/posts/:postId", async function (request, response) {
   let params = {
     TableName: tableName,
-    Key: {
-      id: request.params.postId,
+    KeyConditionExpression: "id = :id",
+    ExpressionAttributeValues: {
+      ":id": request.params.postId,
     },
   };
-  dynamodb.delete(params, (error, result) => {
+  let items = [];
+
+  await dynamodb.query(params, (error, result) => {
     if (error) {
-      response.json({
-        statusCode: 500,
-        error: error.message,
-        url: request.url,
-      });
+      response.json({ statusCode: 500, error: error.message });
+      return;
     } else {
-      response.json({
-        statusCode: 200,
-        url: request.url,
-        body: JSON.stringify(result),
+      console.log(result.Items);
+
+      let paramsDelete = {
+        RequestItems: {},
+      };
+      paramsDelete.RequestItems[tableName] = result.Items.map((value) => {
+        let a = {
+          DeleteRequest: {
+            Key: {
+              id: request.params.postId,
+              title: value.title,
+            },
+          },
+        };
+        return a;
+      });
+      paramsDelete.RequestItems[tableName].forEach((element) => {
+        console.log(element.DeleteRequest.Key.id);
+        console.log(element.DeleteRequest.Key.title);
+      });
+
+      dynamodb.batchWrite(paramsDelete, (error, result) => {
+        if (error) {
+          response.json({
+            statusCode: 500,
+            error: error.message,
+            url: request.url,
+          });
+          return;
+        } else {
+          response.json({
+            statusCode: 200,
+            url: request.url,
+            body: JSON.stringify(result),
+          });
+          return;
+        }
       });
     }
   });
