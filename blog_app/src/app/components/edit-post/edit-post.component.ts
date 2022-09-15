@@ -23,7 +23,8 @@ export class EditPostComponent implements OnInit {
     this.post = new Post();
     this.postId = this.route.snapshot.paramMap.get('postId');
     this.postTitle = this.route.snapshot.paramMap.get('postTitle');
-    this.apiPathWithId = apiPath + '/' + this.postTitle + '/' + this.postId;
+    this.apiPathWithId =
+      apiPath + '/post/' + this.postTitle + '/' + this.postId;
     this.postDataAvailable = false;
 
     this.postParams = new Post();
@@ -87,7 +88,9 @@ export class EditPostComponent implements OnInit {
       },
     };
 
-    API.put(apiName, apiPath, reqOptions)
+    const apiPathUpdatePost = apiPath + '/editPost';
+
+    API.put(apiName, apiPathUpdatePost, reqOptions)
       .then((result) => {
         console.log(JSON.parse(result.body));
         this.router.navigate(['/']);

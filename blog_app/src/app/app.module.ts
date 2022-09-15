@@ -12,6 +12,7 @@ import { CreatePostComponent } from './components/create-post/create-post.compon
 import { PostDetailsComponent } from './components/post-details/post-details.component';
 import { RegisterComponent } from './components/register/register.component';
 import { EditPostComponent } from './components/edit-post/edit-post.component';
+import { EditCommentComponent } from './components/edit-comment/edit-comment.component';
 
 @NgModule({
   declarations: [
@@ -22,6 +23,7 @@ import { EditPostComponent } from './components/edit-post/edit-post.component';
     PostDetailsComponent,
     RegisterComponent,
     EditPostComponent,
+    EditCommentComponent,
   ],
   imports: [
     BrowserModule,

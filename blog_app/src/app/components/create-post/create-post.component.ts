@@ -45,9 +45,9 @@ export class CreatePostComponent implements OnInit {
       body: this.postParams,
     };
 
-    console.log(reqOptions);
+    const apiPathPost = apiPath + '/post';
 
-    API.post(apiName, apiPath, reqOptions)
+    API.post(apiName, apiPathPost, reqOptions)
       .then((result) => {
         console.log(result);
         this.postParams = new Post();
