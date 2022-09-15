@@ -1,7 +1,5 @@
 {
-  "providers": [
-    "awscloudformation"
-  ],
+  "providers": ["awscloudformation"],
   "projectName": "blogapp",
   "version": "3.1",
   "frontend": "javascript",
@@ -9,7 +7,7 @@
     "framework": "angular",
     "config": {
       "SourceDir": "src",
-      "DistributionDir": "dist",
+      "DistributionDir": "dist/blog_app",
       "BuildCommand": "npm run-script build",
       "StartCommand": "ng serve"
     }
