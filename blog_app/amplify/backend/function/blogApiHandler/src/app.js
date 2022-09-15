@@ -122,7 +122,7 @@ app.get("/posts/comments/:postId", function (request, response) {
  * HTTP Get method for get single object *
  *****************************************/
 
-app.get("/posts/:postTitle/:postId", function (request, response) {
+app.get("/posts/post/:postTitle/:postId", function (request, response) {
   let params = {
     TableName: tableName,
     Key: {
@@ -143,11 +143,58 @@ app.get("/posts/:postTitle/:postId", function (request, response) {
   });
 });
 
+app.get("/posts/comment/:postId/:commentId", function (request, response) {
+  let params = {
+    TableName: tableName,
+    KeyConditionExpression: "#pk = :pk And #sk = :sk",
+    ExpressionAttributeValues: {
+      ":pk": request.params.postId,
+      ":sk": "COMMENT#" + request.params.commentId,
+    },
+    ExpressionAttributeNames: {
+      "#pk": "id",
+      "#sk": "title",
+    },
+  };
+  dynamodb.query(params, (error, result) => {
+    if (error) {
+      response.json({ statusCode: 500, error: error.message });
+    } else {
+      response.json({
+        statusCode: 200,
+        url: request.url,
+        body: JSON.stringify(result.Items),
+      });
+    }
+  });
+});
+
+app.get("/posts/commentVotes/:postId/:commentId", function (request, response) {
+  let params = {
+    TableName: tableName,
+    Key: {
+      id: request.params.postId,
+      title: "POST#" + request.params.commentId,
+    },
+  };
+  dynamodb.get(params, (error, result) => {
+    if (error) {
+      response.json({ statusCode: 500, error: error.message });
+    } else {
+      response.json({
+        statusCode: 200,
+        url: request.url,
+        body: JSON.stringify(result.Item),
+      });
+    }
+  });
+});
+
 /************************************
  * HTTP put method for insert object *
  *************************************/
 
-app.put("/posts", function (request, response) {
+app.put("/posts/editPost", function (request, response) {
   if (getUserId(request) === request.body.userId) {
     const timestamp = new Date().toISOString();
     const params = {
@@ -196,14 +243,60 @@ app.put("/posts", function (request, response) {
       statusCode: 403,
       url: request.url,
       error: "Forbidden",
-      reqId: request.body.userId,
-      getUserId: getUserId(request),
+    });
+  }
+});
+
+app.put("/posts/editComment", function (request, response) {
+  if (getUserId(request) === request.body.userId) {
+    const timestamp = new Date().toISOString();
+    const params = {
+      TableName: tableName,
+      Key: {
+        id: request.body.id,
+        title: request.body.title,
+      },
+      ExpressionAttributeNames: {
+        "#content": "content",
+      },
+      ExpressionAttributeValues: {},
+      ReturnValues: "UPDATED_NEW",
+    };
+    params.UpdateExpression = "SET ";
+    if (request.body.content) {
+      params.ExpressionAttributeValues[":content"] = request.body.content;
+      params.UpdateExpression += "#content = :content, ";
+    }
+    if (request.body.title || request.body.content) {
+      params.ExpressionAttributeValues[":updatedAt"] = timestamp;
+      params.UpdateExpression += "updatedAt = :updatedAt";
+    }
+    dynamodb.update(params, (error, result) => {
+      if (error) {
+        response.json({
+          statusCode: 500,
+          error: error.message,
+          url: request.url,
+        });
+      } else {
+        response.json({
+          statusCode: 200,
+          url: request.url,
+          body: JSON.stringify(result.Attributes),
+        });
+      }
+    });
+  } else {
+    response.json({
+      statusCode: 403,
+      url: request.url,
+      error: "Forbidden",
     });
   }
 });
 
 // upvoting a comment
-app.put("/posts", function (request, response) {
+app.put("/posts/upvoteComment", function (request, response) {
   const params = {
     TableName: tableName,
     Key: {
@@ -212,24 +305,43 @@ app.put("/posts", function (request, response) {
     },
     ExpressionAttributeNames: {
       "#upvotes": "upvotes",
-      "#downvotes": "downvotes",
     },
-    ExpressionAttributeValues: {},
+    ExpressionAttributeValues: { ":upvote": 1 },
+    UpdateExpression: "SET #upvotes = #upvotes + :upvote",
     ReturnValues: "UPDATED_NEW",
   };
-  params.UpdateExpression = "SET ";
-  if (request.body.upvote) {
-    params.ExpressionAttributeValues[":text"] = request.body.text;
-    params.UpdateExpression += "#text = :text, ";
-  }
-  if (request.body.complete) {
-    params.ExpressionAttributeValues[":downvotes"] = request.body.complete;
-    params.UpdateExpression += "downvotes = :downvotes, ";
-  }
-  if (request.body.text || request.body.complete) {
-    params.ExpressionAttributeValues[":updatedAt"] = timestamp;
-    params.UpdateExpression += "updatedAt = :updatedAt";
-  }
+  dynamodb.update(params, (error, result) => {
+    if (error) {
+      response.json({
+        statusCode: 500,
+        error: error.message,
+        url: request.url,
+      });
+    } else {
+      response.json({
+        statusCode: 200,
+        url: request.url,
+        body: JSON.stringify(result.Attributes),
+      });
+    }
+  });
+});
+
+// downvoting a comment
+app.put("/posts/downvoteComment", function (request, response) {
+  const params = {
+    TableName: tableName,
+    Key: {
+      id: request.body.id,
+      title: request.body.title,
+    },
+    ExpressionAttributeNames: {
+      "#downvotes": "downvotes",
+    },
+    ExpressionAttributeValues: { ":downvote": 1 },
+    UpdateExpression: "SET #downvotes = #downvotes + :downvote",
+    ReturnValues: "UPDATED_NEW",
+  };
   dynamodb.update(params, (error, result) => {
     if (error) {
       response.json({
@@ -251,7 +363,7 @@ app.put("/posts", function (request, response) {
  * HTTP post method for insert object *
  *************************************/
 
-app.post("/posts", function (request, response) {
+app.post("/posts/post", function (request, response) {
   const timestamp = new Date().toISOString();
   request.body.title = "POST#" + request.body.title;
   let params = {
@@ -330,7 +442,7 @@ const getUserId = (request) => {
  * HTTP remove method to delete object *
  ***************************************/
 
-app.delete("/posts/:postId", async function (request, response) {
+app.delete("/posts/deletePost/:postId", async function (request, response) {
   if (getUserId(request) === request.body.userId) {
     let params = {
       TableName: tableName,
@@ -391,8 +503,39 @@ app.delete("/posts/:postId", async function (request, response) {
       statusCode: 403,
       url: request.url,
       error: "Forbidden",
-      reqId: request.body.userId,
-      getUserId: getUserId(request),
+    });
+  }
+});
+
+app.delete("/posts/deleteComment", async function (request, response) {
+  if (getUserId(request) === request.body.userId) {
+    let params = {
+      TableName: tableName,
+      Key: {
+        id: request.body.postId,
+        title: request.body.commentId,
+      },
+    };
+    dynamodb.delete(params, (error, result) => {
+      if (error) {
+        response.json({
+          statusCode: 500,
+          error: error.message,
+          url: request.url,
+        });
+      } else {
+        response.json({
+          statusCode: 200,
+          url: request.url,
+          body: JSON.stringify(result),
+        });
+      }
+    });
+  } else {
+    response.json({
+      statusCode: 403,
+      url: request.url,
+      error: "Forbidden",
     });
   }
 });
