@@ -55,7 +55,9 @@
               </p>
             </div>
             <hr />
+
             <div class="line-divider"></div>
+
             <div class="" *ngFor="let comment of comments">
               <div class="row">
                 <div class="col-md-10">
@@ -66,16 +68,43 @@
                     {{ comment.author }}
                   </p>
                   <p>
-                    <span class="fa fa-arrow-up vote up"> </span>
                     <span class="vote-count">
-                      {{ comment.upvotes - comment.downvotes }}
+                      {{ comment.upvotes }}
                     </span>
-                    <span class="fa fa-arrow-down vote down"> </span>
+                    <span
+                      class="fa fa-arrow-up vote up"
+                      (click)="upvote(comment.title)"
+                    >
+                    </span>
+                    <span
+                      class="fa fa-arrow-down vote down"
+                      (click)="downvote(comment.title)"
+                    >
+                    </span>
+                    <span class="vote-count">{{ comment.downvotes }} </span>
+                    <span class="ml-3 mr-3"
+                      >Comment score:
+                      {{ comment.upvotes - comment.downvotes }}</span
+                    >
                   </p>
                 </div>
                 <div class="col-md-2 p-2">
-                  <button class="btn btn-primary m-1">Delete</button>
-                  <button class="btn btn-primary m-1">Edit</button>
+                  <button
+                    class="btn btn-primary m-1"
+                    (click)="deleteComment(comment.title, comment.userId)"
+                  >
+                    Delete
+                  </button>
+                  <button
+                    class="btn btn-primary m-1"
+                    [routerLink]="[
+                      '/edit-comment',
+                      postId,
+                      comment.title.replace('COMMENT#', '')
+                    ]"
+                  >
+                    Edit
+                  </button>
                 </div>
                 <hr />
               </div>

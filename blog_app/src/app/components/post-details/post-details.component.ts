@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Post } from 'src/app/classes/post';
 import { API, Auth } from 'aws-amplify';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CognitoService } from 'src/app/services/cognito.service';
 import { Comment } from 'src/app/classes/comment';
 
@@ -16,12 +16,14 @@ const apiPath = '/posts';
 export class PostDetailsComponent implements OnInit {
   constructor(
     public route: ActivatedRoute,
+    public router: Router,
     public cognitoService: CognitoService
   ) {
     this.post = new Post();
     this.postId = this.route.snapshot.paramMap.get('postId');
     this.postTitle = this.route.snapshot.paramMap.get('postTitle');
-    this.apiPathWithId = apiPath + '/' + this.postTitle + '/' + this.postId;
+    this.apiPathWithId =
+      apiPath + '/post/' + this.postTitle + '/' + this.postId;
     this.postDataAvailable = false;
     this.allowComments = false;
 
@@ -39,7 +41,7 @@ export class PostDetailsComponent implements OnInit {
 
   // Data for getting post from DB
   public post: Post;
-  private postId: string | null;
+  public postId: string | null;
   private postTitle: string | null;
   private apiPathWithId: string;
   public postDataAvailable: boolean;
@@ -121,7 +123,9 @@ export class PostDetailsComponent implements OnInit {
 
     await API.get(apiName, apiPathComents, reqOptions)
       .then((result) => {
-        this.comments = JSON.parse(result.body);
+        this.comments = JSON.parse(result.body).sort(
+          (objA: Comment, objB: Comment) => objB.upvotes - objA.upvotes
+        );
         this.commentDataAvailable = true;
       })
       .catch((err) => {
@@ -130,7 +134,7 @@ export class PostDetailsComponent implements OnInit {
   }
 
   public async deletePost(): Promise<void> {
-    const apiPathDelete = apiPath + '/' + this.postId;
+    const apiPathDelete = apiPath + '/deletePost/' + this.postId;
     console.log(apiPathDelete);
     var token: string | null;
     try {
@@ -146,6 +150,98 @@ export class PostDetailsComponent implements OnInit {
     await API.del(apiName, apiPathDelete, reqOptions)
       .then((result) => {
         console.log(result);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  public async upvote(commentId: string): Promise<void> {
+    const apiPathDelete = apiPath + '/' + this.postId;
+    console.log(apiPathDelete);
+    var token: string | null;
+    try {
+      token = (await Auth.currentSession()).getIdToken().getJwtToken();
+    } catch (e) {
+      token = null;
+    }
+
+    const reqOptions = {
+      Authorization: token,
+      body: {
+        id: this.postId,
+        title: commentId,
+      },
+    };
+
+    const apiPathUpvote = apiPath + '/upvoteComment';
+
+    API.put(apiName, apiPathUpvote, reqOptions)
+      .then((result) => {
+        console.log(JSON.parse(result.body));
+        location.reload();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  public async downvote(commentId: string): Promise<void> {
+    var token: string | null;
+    try {
+      token = (await Auth.currentSession()).getIdToken().getJwtToken();
+    } catch (e) {
+      token = null;
+    }
+
+    const reqOptions = {
+      Authorization: token,
+      body: {
+        id: this.postId,
+        title: commentId,
+      },
+    };
+
+    const apiPathDownpvote = apiPath + '/downvoteComment';
+    console.log(apiPathDownpvote);
+
+    API.put(apiName, apiPathDownpvote, reqOptions)
+      .then((result) => {
+        console.log(JSON.parse(result.body));
+        location.reload();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  public async deleteComment(
+    commentId: string,
+    commentUserId: string
+  ): Promise<void> {
+    console.log(commentId);
+    const apiPathDeleteComment = apiPath + '/deleteComment';
+    var token: string | null;
+    try {
+      token = (await Auth.currentSession()).getIdToken().getJwtToken();
+    } catch (e) {
+      token = null;
+    }
+    const reqOptions = {
+      Authorization: token,
+      body: {
+        userId: commentUserId,
+        postId: this.postId,
+        commentId: commentId,
+      },
+    };
+
+    console.log(reqOptions);
+    console.log(apiPathDeleteComment);
+
+    await API.del(apiName, apiPathDeleteComment, reqOptions)
+      .then((result) => {
+        location.reload();
       })
       .catch((err) => {
         console.log(err);
