@@ -92,7 +92,6 @@ export class EditPostComponent implements OnInit {
 
     API.put(apiName, apiPathUpdatePost, reqOptions)
       .then((result) => {
-        console.log(JSON.parse(result.body));
         this.router.navigate(['/']);
       })
       .catch((err) => {

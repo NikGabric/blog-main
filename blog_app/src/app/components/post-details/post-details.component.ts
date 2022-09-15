@@ -4,6 +4,7 @@ import { API, Auth } from 'aws-amplify';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CognitoService } from 'src/app/services/cognito.service';
 import { Comment } from 'src/app/classes/comment';
+import { User } from 'src/app/classes/user';
 
 const apiName = 'blogApi';
 const apiPath = '/posts';
@@ -38,6 +39,7 @@ export class PostDetailsComponent implements OnInit {
   }
 
   public loading: boolean;
+  public allowEdit: boolean;
 
   // Data for getting post from DB
   public post: Post;
@@ -53,9 +55,6 @@ export class PostDetailsComponent implements OnInit {
   // Data for showing comments
   public comments: Comment[];
   public commentDataAvailable: boolean;
-
-  // Data for edit/delete post
-  public allowEdit: boolean;
 
   private async getPostData(): Promise<void> {
     var token: string | null;
@@ -98,7 +97,6 @@ export class PostDetailsComponent implements OnInit {
 
     API.post(apiName, apiPathCommentCreation, reqOptions)
       .then((result) => {
-        console.log(result);
         this.commentParams = new Comment();
         this.commentDataAvailable = true;
         this.getComments();
@@ -135,7 +133,6 @@ export class PostDetailsComponent implements OnInit {
 
   public async deletePost(): Promise<void> {
     const apiPathDelete = apiPath + '/deletePost/' + this.postId;
-    console.log(apiPathDelete);
     var token: string | null;
     try {
       token = (await Auth.currentSession()).getIdToken().getJwtToken();
@@ -149,7 +146,7 @@ export class PostDetailsComponent implements OnInit {
 
     await API.del(apiName, apiPathDelete, reqOptions)
       .then((result) => {
-        console.log(result);
+        this.router.navigate(['/']);
       })
       .catch((err) => {
         console.log(err);
@@ -158,7 +155,6 @@ export class PostDetailsComponent implements OnInit {
 
   public async upvote(commentId: string): Promise<void> {
     const apiPathDelete = apiPath + '/' + this.postId;
-    console.log(apiPathDelete);
     var token: string | null;
     try {
       token = (await Auth.currentSession()).getIdToken().getJwtToken();
@@ -178,7 +174,6 @@ export class PostDetailsComponent implements OnInit {
 
     API.put(apiName, apiPathUpvote, reqOptions)
       .then((result) => {
-        console.log(JSON.parse(result.body));
         location.reload();
       })
       .catch((err) => {
@@ -203,11 +198,9 @@ export class PostDetailsComponent implements OnInit {
     };
 
     const apiPathDownpvote = apiPath + '/downvoteComment';
-    console.log(apiPathDownpvote);
 
     API.put(apiName, apiPathDownpvote, reqOptions)
       .then((result) => {
-        console.log(JSON.parse(result.body));
         location.reload();
       })
       .catch((err) => {
@@ -219,7 +212,6 @@ export class PostDetailsComponent implements OnInit {
     commentId: string,
     commentUserId: string
   ): Promise<void> {
-    console.log(commentId);
     const apiPathDeleteComment = apiPath + '/deleteComment';
     var token: string | null;
     try {
@@ -233,11 +225,9 @@ export class PostDetailsComponent implements OnInit {
         userId: commentUserId,
         postId: this.postId,
         commentId: commentId,
+        postUserId: this.post.userId,
       },
     };
-
-    console.log(reqOptions);
-    console.log(apiPathDeleteComment);
 
     await API.del(apiName, apiPathDeleteComment, reqOptions)
       .then((result) => {

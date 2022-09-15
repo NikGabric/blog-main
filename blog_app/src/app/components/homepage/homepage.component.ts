@@ -42,8 +42,11 @@ export class HomepageComponent implements OnInit {
 
     API.get(apiName, apiPath, reqOptions)
       .then((result) => {
-        this.posts = JSON.parse(result.body);
-        console.log('Posts: ', this.posts);
+        this.posts = JSON.parse(result.body).sort(
+          (objA: Post, objB: Post) =>
+            new Date(objB.updatedAt).getTime() -
+            new Date(objA.updatedAt).getTime()
+        );
         this.postsToDisplay = this.posts.slice(0, 3);
         this.loading = false;
       })

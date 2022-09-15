@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Route, Router, ActivatedRoute } from '@angular/router';
-import { Post } from 'src/app/classes/post';
+import { Router, ActivatedRoute } from '@angular/router';
 import { Comment } from 'src/app/classes/comment';
 
 import { CognitoService } from 'src/app/services/cognito.service';
@@ -47,7 +46,6 @@ export class EditCommentComponent implements OnInit {
     await API.get(apiName, apiPathComment, reqOptions)
       .then((result) => {
         this.commentParams = JSON.parse(result.body)[0];
-        console.log(this.commentParams);
       })
       .catch((err) => {
         console.log('Error: ', err);
@@ -76,12 +74,9 @@ export class EditCommentComponent implements OnInit {
     };
 
     const apiPathCommentEdit = apiPath + '/editComment';
-    console.log(reqOptions);
-    console.log(apiPathCommentEdit);
 
     API.put(apiName, apiPathCommentEdit, reqOptions)
       .then((result) => {
-        console.log(JSON.parse(result.body));
         this.router.navigate(['/']);
       })
       .catch((err) => {

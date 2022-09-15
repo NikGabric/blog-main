@@ -18,7 +18,6 @@ export class LoginComponent {
   }
 
   public login(): void {
-    console.log(this.user);
     this.loading = true;
     this.cognitoService
       .signIn(this.user)
