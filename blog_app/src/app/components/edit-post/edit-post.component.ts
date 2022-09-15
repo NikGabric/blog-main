@@ -17,7 +17,8 @@ const apiPath = '/posts';
 export class EditPostComponent implements OnInit {
   constructor(
     public route: ActivatedRoute,
-    public cognitoService: CognitoService
+    public cognitoService: CognitoService,
+    private router: Router
   ) {
     this.post = new Post();
     this.postId = this.route.snapshot.paramMap.get('postId');
@@ -55,10 +56,9 @@ export class EditPostComponent implements OnInit {
     await API.get(apiName, this.apiPathWithId, reqOptions)
       .then((result) => {
         this.postParams = JSON.parse(result.body);
+        this.post = JSON.parse(result.body);
         this.oldPostTitle = this.postParams.title;
-        this.postParams.title = this.postParams.title.replaceAll('POST#', '');
         this.postDataAvailable = true;
-        console.log(this.postParams.title);
       })
       .catch((err) => {
         console.log('Error: ', err);
@@ -66,32 +66,33 @@ export class EditPostComponent implements OnInit {
   }
 
   public async editPost(): Promise<void> {
-    const token = (await Auth.currentSession()).getIdToken().getJwtToken();
-    const user = await this.cognitoService.getUser();
-    // this.postParams.title = 'POST#' + this.postParams.title;
+    var token: string | null;
+    var user: any;
+    try {
+      token = (await Auth.currentSession()).getIdToken().getJwtToken();
+      user = await this.cognitoService.getUser();
+    } catch (e) {
+      token = null;
+      user = null;
+    }
+
     this.postParams.author = user.username;
     this.postParams.comments = [];
     this.postParams.id = this.postId;
 
     const reqOptions = {
       Authorization: token,
-      body: { ...this.postParams, oldPostTitle: this.oldPostTitle },
+      body: {
+        ...this.postParams,
+        oldPostTitle: this.oldPostTitle,
+        authorId: this.post.userId,
+      },
     };
-
-    console.log(reqOptions);
-
-    // API.post(apiName, apiPath, reqOptions)
-    //   .then((result) => {
-    //     console.log(result);
-    //     this.postParams = new Post();
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //   });
 
     API.put(apiName, apiPath, reqOptions)
       .then((result) => {
         console.log(JSON.parse(result.body));
+        this.router.navigate(['/']);
       })
       .catch((err) => {
         console.log(err);
