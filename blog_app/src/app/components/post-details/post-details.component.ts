@@ -30,6 +30,8 @@ export class PostDetailsComponent implements OnInit {
     this.comments = [];
     this.commentDataAvailable = false;
 
+    this.allowEdit = false;
+
     this.loading = true;
   }
 
@@ -50,12 +52,18 @@ export class PostDetailsComponent implements OnInit {
   public comments: Comment[];
   public commentDataAvailable: boolean;
 
+  // Data for edit/delete post
+  public allowEdit: boolean;
+
   private async getPostData(): Promise<void> {
     var token: string | null;
+    var user: any;
     try {
       token = (await Auth.currentSession()).getIdToken().getJwtToken();
+      user = await this.cognitoService.getUser();
     } catch (e) {
       token = null;
+      user = null;
     }
     const reqOptions = {
       Authorization: token,
@@ -65,8 +73,8 @@ export class PostDetailsComponent implements OnInit {
       .then((result) => {
         this.post = JSON.parse(result.body);
         this.postDataAvailable = true;
-        console.log(this.post);
         this.loading = false;
+        if (this.post.userId === user.id) this.allowEdit = true;
       })
       .catch((err) => {
         console.log('Error: ', err);
@@ -85,9 +93,6 @@ export class PostDetailsComponent implements OnInit {
       body: this.commentParams,
     };
     const apiPathCommentCreation = apiPath + '/comment/' + this.postId;
-
-    console.log('Comment parameters: ' + this.commentParams);
-    console.log(apiPathCommentCreation);
 
     API.post(apiName, apiPathCommentCreation, reqOptions)
       .then((result) => {
@@ -113,13 +118,11 @@ export class PostDetailsComponent implements OnInit {
     };
 
     const apiPathComents = apiPath + '/comments/' + this.postId;
-    console.log(apiPathComents);
 
     await API.get(apiName, apiPathComents, reqOptions)
       .then((result) => {
         this.comments = JSON.parse(result.body);
         this.commentDataAvailable = true;
-        console.log(this.comments);
       })
       .catch((err) => {
         console.log('Error: ', err);
@@ -127,8 +130,6 @@ export class PostDetailsComponent implements OnInit {
   }
 
   public async deletePost(): Promise<void> {
-    console.log('delete');
-
     const apiPathDelete = apiPath + '/' + this.postId;
     console.log(apiPathDelete);
 

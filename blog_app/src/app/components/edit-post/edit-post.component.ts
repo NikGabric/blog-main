@@ -25,7 +25,6 @@ export class EditPostComponent implements OnInit {
     this.postTitle = this.route.snapshot.paramMap.get('postTitle');
     this.apiPathWithId = apiPath + '/' + this.postTitle + '/' + this.postId;
     this.postDataAvailable = false;
-    this.allowComments = false;
 
     this.postParams = new Post();
     this.oldPostTitle = '';
@@ -37,7 +36,6 @@ export class EditPostComponent implements OnInit {
   private postTitle: string | null;
   private apiPathWithId: string;
   public postDataAvailable: boolean;
-  public allowComments: boolean;
 
   public postParams: Post;
   private oldPostTitle: string;
