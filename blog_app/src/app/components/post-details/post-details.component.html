@@ -81,17 +81,20 @@
                       (click)="downvote(comment.title)"
                     >
                     </span>
-                    <span class="vote-count">{{ comment.downvotes }} </span>
+                    <span class="vote-count">
+                      {{ comment.downvotes }}
+                    </span>
                     <span class="ml-3 mr-3"
                       >Comment score:
                       {{ comment.upvotes - comment.downvotes }}</span
                     >
                   </p>
                 </div>
-                <div class="col-md-2 p-2" *ngIf="comment.allowEdit">
+                <div class="col-md-2 p-2">
                   <button
                     class="btn btn-primary m-1"
                     (click)="deleteComment(comment.title, comment.userId)"
+                    *ngIf="comment.allowDelete"
                   >
                     Delete
                   </button>
@@ -102,6 +105,7 @@
                       postId,
                       comment.title.replace('COMMENT#', '')
                     ]"
+                    *ngIf="comment.allowEdit"
                   >
                     Edit
                   </button>

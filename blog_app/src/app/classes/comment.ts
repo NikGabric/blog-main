@@ -9,4 +9,5 @@ export class Comment {
   'upvotes': number;
   'downvotes': number;
   'allowEdit': boolean;
+  'allowDelete': boolean;
 }

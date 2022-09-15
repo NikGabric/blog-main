@@ -74,7 +74,8 @@ export class PostDetailsComponent implements OnInit {
         this.post = JSON.parse(result.body);
         this.postDataAvailable = true;
         this.loading = false;
-        if (user.attributes.sub === this.post.userId) this.allowPostEdit = true;
+        if (user != null && user.attributes.sub === this.post.userId)
+          this.allowPostEdit = true;
       })
       .catch((err) => {
         console.log('Error: ', err);
@@ -127,7 +128,12 @@ export class PostDetailsComponent implements OnInit {
           (objA: Comment, objB: Comment) => objB.upvotes - objA.upvotes
         );
         this.comments.forEach((comment) => {
-          if (user.attributes.sub === comment.userId) comment.allowEdit = true;
+          if (user != null && user.attributes.sub === comment.userId) {
+            comment.allowEdit = true;
+            comment.allowDelete = true;
+          } else if (user != null && user.attributes.sub === this.post.userId) {
+            comment.allowDelete = true;
+          }
         });
         this.commentDataAvailable = true;
       })
