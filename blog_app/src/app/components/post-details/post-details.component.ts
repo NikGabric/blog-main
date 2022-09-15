@@ -132,8 +132,18 @@ export class PostDetailsComponent implements OnInit {
   public async deletePost(): Promise<void> {
     const apiPathDelete = apiPath + '/' + this.postId;
     console.log(apiPathDelete);
+    var token: string | null;
+    try {
+      token = (await Auth.currentSession()).getIdToken().getJwtToken();
+    } catch (e) {
+      token = null;
+    }
+    const reqOptions = {
+      Authorization: token,
+      body: { userId: this.post.userId },
+    };
 
-    await API.del(apiName, apiPathDelete, {})
+    await API.del(apiName, apiPathDelete, reqOptions)
       .then((result) => {
         console.log(result);
       })

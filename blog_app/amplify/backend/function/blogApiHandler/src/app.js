@@ -331,60 +331,70 @@ const getUserId = (request) => {
  ***************************************/
 
 app.delete("/posts/:postId", async function (request, response) {
-  let params = {
-    TableName: tableName,
-    KeyConditionExpression: "id = :id",
-    ExpressionAttributeValues: {
-      ":id": request.params.postId,
-    },
-  };
-  let items = [];
+  if (getUserId(request) === request.body.userId) {
+    let params = {
+      TableName: tableName,
+      KeyConditionExpression: "id = :id",
+      ExpressionAttributeValues: {
+        ":id": request.params.postId,
+      },
+    };
+    let items = [];
 
-  await dynamodb.query(params, (error, result) => {
-    if (error) {
-      response.json({ statusCode: 500, error: error.message });
-      return;
-    } else {
-      console.log(result.Items);
+    await dynamodb.query(params, (error, result) => {
+      if (error) {
+        response.json({ statusCode: 500, error: error.message });
+        return;
+      } else {
+        console.log(result.Items);
 
-      let paramsDelete = {
-        RequestItems: {},
-      };
-      paramsDelete.RequestItems[tableName] = result.Items.map((value) => {
-        let a = {
-          DeleteRequest: {
-            Key: {
-              id: request.params.postId,
-              title: value.title,
-            },
-          },
+        let paramsDelete = {
+          RequestItems: {},
         };
-        return a;
-      });
-      paramsDelete.RequestItems[tableName].forEach((element) => {
-        console.log(element.DeleteRequest.Key.id);
-        console.log(element.DeleteRequest.Key.title);
-      });
+        paramsDelete.RequestItems[tableName] = result.Items.map((value) => {
+          let a = {
+            DeleteRequest: {
+              Key: {
+                id: request.params.postId,
+                title: value.title,
+              },
+            },
+          };
+          return a;
+        });
+        paramsDelete.RequestItems[tableName].forEach((element) => {
+          console.log(element.DeleteRequest.Key.id);
+          console.log(element.DeleteRequest.Key.title);
+        });
 
-      dynamodb.batchWrite(paramsDelete, (error, result) => {
-        if (error) {
-          response.json({
-            statusCode: 500,
-            error: error.message,
-            url: request.url,
-          });
-          return;
-        } else {
-          response.json({
-            statusCode: 200,
-            url: request.url,
-            body: JSON.stringify(result),
-          });
-          return;
-        }
-      });
-    }
-  });
+        dynamodb.batchWrite(paramsDelete, (error, result) => {
+          if (error) {
+            response.json({
+              statusCode: 500,
+              error: error.message,
+              url: request.url,
+            });
+            return;
+          } else {
+            response.json({
+              statusCode: 200,
+              url: request.url,
+              body: JSON.stringify(result),
+            });
+            return;
+          }
+        });
+      }
+    });
+  } else {
+    response.json({
+      statusCode: 403,
+      url: request.url,
+      error: "Forbidden",
+      reqId: request.body.userId,
+      getUserId: getUserId(request),
+    });
+  }
 });
 
 app.listen(3000, function () {
