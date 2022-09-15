@@ -33,13 +33,10 @@ export class PostDetailsComponent implements OnInit {
     this.comments = [];
     this.commentDataAvailable = false;
 
-    this.allowEdit = false;
-
     this.loading = true;
   }
 
   public loading: boolean;
-  public allowEdit: boolean;
 
   // Data for getting post from DB
   public post: Post;
@@ -75,7 +72,6 @@ export class PostDetailsComponent implements OnInit {
         this.post = JSON.parse(result.body);
         this.postDataAvailable = true;
         this.loading = false;
-        if (this.post.userId === user.id) this.allowEdit = true;
       })
       .catch((err) => {
         console.log('Error: ', err);
