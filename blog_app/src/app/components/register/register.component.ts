@@ -31,7 +31,6 @@ export class RegisterComponent implements OnInit {
       return;
     }
 
-    console.log(this.user);
     this.cognitoService
       .signUp(this.user)
       .then(() => {
@@ -55,7 +54,15 @@ export class RegisterComponent implements OnInit {
     this.cognitoService
       .confirmSignUp(this.user)
       .then(() => {
-        this.router.navigate(['/signIn']);
+        this.cognitoService
+          .signIn(this.user)
+          .then(() => {
+            this.loading = false;
+            this.router.navigate(['/']);
+          })
+          .catch(() => {
+            this.loading = false;
+          });
       })
       .catch(() => {
         this.loading = false;
