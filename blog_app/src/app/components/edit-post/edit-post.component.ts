@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { Route, Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { Post } from 'src/app/classes/post';
 
-import { ApiService } from 'src/app/services/api.service';
 import { CognitoService } from 'src/app/services/cognito.service';
 import { API, Auth } from 'aws-amplify';
 
@@ -83,7 +82,7 @@ export class EditPostComponent implements OnInit {
       Authorization: token,
       body: {
         ...this.postParams,
-        oldPostTitle: this.oldPostTitle,
+        oldPostTitle: this.oldPostTitle.replace('POST#', ''),
         authorId: this.post.userId,
       },
     };
