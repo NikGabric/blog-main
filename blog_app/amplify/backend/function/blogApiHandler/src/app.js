@@ -263,55 +263,67 @@ app.put("/posts/editPost", async function (request, response) {
   });
 });
 
-app.put("/posts/editComment", function (request, response) {
-  if (
-    getUserId(request) ===
-    getUserIdPostComment(request.body.id, request.body.title)
-  ) {
-    const timestamp = new Date().toISOString();
-    const params = {
-      TableName: tableName,
-      Key: {
-        id: request.body.id,
-        title: request.body.title,
-      },
-      ExpressionAttributeNames: {
-        "#content": "content",
-      },
-      ExpressionAttributeValues: {},
-      ReturnValues: "UPDATED_NEW",
-    };
-    params.UpdateExpression = "SET ";
-    if (request.body.content) {
-      params.ExpressionAttributeValues[":content"] = request.body.content;
-      params.UpdateExpression += "#content = :content, ";
-    }
-    if (request.body.title || request.body.content) {
-      params.ExpressionAttributeValues[":updatedAt"] = timestamp;
-      params.UpdateExpression += "updatedAt = :updatedAt";
-    }
-    dynamodb.update(params, (error, result) => {
-      if (error) {
-        response.json({
-          statusCode: 500,
-          error: error.message,
-          url: request.url,
+app.put("/posts/editComment", async function (request, response) {
+  let checkIdParams = {
+    TableName: tableName,
+    Key: {
+      id: request.body.id,
+      title: request.body.title,
+    },
+  };
+  await dynamodb.get(checkIdParams, async (error, res) => {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log("res: ", res);
+      let commenterId = res.Item.userId;
+      if (getUserId(request) === commenterId) {
+        const timestamp = new Date().toISOString();
+        const params = {
+          TableName: tableName,
+          Key: {
+            id: request.body.id,
+            title: request.body.title,
+          },
+          ExpressionAttributeNames: {
+            "#content": "content",
+          },
+          ExpressionAttributeValues: {},
+          ReturnValues: "UPDATED_NEW",
+        };
+        params.UpdateExpression = "SET ";
+        if (request.body.content) {
+          params.ExpressionAttributeValues[":content"] = request.body.content;
+          params.UpdateExpression += "#content = :content, ";
+        }
+        if (request.body.title || request.body.content) {
+          params.ExpressionAttributeValues[":updatedAt"] = timestamp;
+          params.UpdateExpression += "updatedAt = :updatedAt";
+        }
+        dynamodb.update(params, (error, result) => {
+          if (error) {
+            response.json({
+              statusCode: 500,
+              error: error.message,
+              url: request.url,
+            });
+          } else {
+            response.json({
+              statusCode: 200,
+              url: request.url,
+              body: JSON.stringify(result.Attributes),
+            });
+          }
         });
       } else {
         response.json({
-          statusCode: 200,
+          statusCode: 403,
           url: request.url,
-          body: JSON.stringify(result.Attributes),
+          error: "Forbidden",
         });
       }
-    });
-  } else {
-    response.json({
-      statusCode: 403,
-      url: request.url,
-      error: "Forbidden",
-    });
-  }
+    }
+  });
 });
 
 // upvoting a comment

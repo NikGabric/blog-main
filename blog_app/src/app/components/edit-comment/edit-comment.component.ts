@@ -73,7 +73,9 @@ export class EditCommentComponent implements OnInit {
       },
     };
 
+    console.log(reqOptions);
     const apiPathCommentEdit = apiPath + '/editComment';
+    console.log(apiPathCommentEdit);
 
     API.put(apiName, apiPathCommentEdit, reqOptions)
       .then((result) => {
