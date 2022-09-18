@@ -20,7 +20,7 @@
       "function": {
         "blogApiHandler": {
           "deploymentBucketName": "amplify-blogapp-dev-135111-deployment",
-          "s3Key": "amplify-builds/blogApiHandler-647579736c4e53695968-build.zip"
+          "s3Key": "amplify-builds/blogApiHandler-35795a69306c52447337-build.zip"
         }
       },
       "hosting": {

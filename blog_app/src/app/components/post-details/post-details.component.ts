@@ -143,7 +143,8 @@ export class PostDetailsComponent implements OnInit {
   }
 
   public async deletePost(): Promise<void> {
-    const apiPathDelete = apiPath + '/deletePost/' + this.postId;
+    const apiPathDelete =
+      apiPath + '/deletePost/' + this.postId + '/' + this.postTitle;
     var token: string | null;
     try {
       token = (await Auth.currentSession()).getIdToken().getJwtToken();
@@ -165,7 +166,6 @@ export class PostDetailsComponent implements OnInit {
   }
 
   public async upvote(commentId: string): Promise<void> {
-    const apiPathDelete = apiPath + '/' + this.postId;
     var token: string | null;
     try {
       token = (await Auth.currentSession()).getIdToken().getJwtToken();
@@ -235,8 +235,9 @@ export class PostDetailsComponent implements OnInit {
       body: {
         userId: commentUserId,
         postId: this.postId,
-        commentId: commentId,
+        commentId: commentId.replace('COMMENT#', ''),
         postUserId: this.post.userId,
+        postTitle: this.post.title.replace('POST#', ''),
       },
     };
 

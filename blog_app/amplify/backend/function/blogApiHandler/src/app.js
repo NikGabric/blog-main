@@ -195,7 +195,10 @@ app.get("/posts/commentVotes/:postId/:commentId", function (request, response) {
  *************************************/
 
 app.put("/posts/editPost", function (request, response) {
-  if (getUserId(request) === request.body.userId) {
+  if (
+    getUserId(request) ===
+    getUserIdPostComment(request.body.id, request.body.oldPostTitle)
+  ) {
     const timestamp = new Date().toISOString();
     const params = {
       TableName: tableName,
@@ -248,7 +251,10 @@ app.put("/posts/editPost", function (request, response) {
 });
 
 app.put("/posts/editComment", function (request, response) {
-  if (getUserId(request) === request.body.userId) {
+  if (
+    getUserId(request) ===
+    getUserIdPostComment(request.body.id, request.body.title)
+  ) {
     const timestamp = new Date().toISOString();
     const params = {
       TableName: tableName,
@@ -442,44 +448,182 @@ const getUserId = (request) => {
  * HTTP remove method to delete object *
  ***************************************/
 
-app.delete("/posts/deletePost/:postId", async function (request, response) {
-  if (getUserId(request) === request.body.userId) {
-    let params = {
+app.delete(
+  "/posts/deletePost/:postId/:postTitle",
+  async function (request, response) {
+    // const requestUserId = getUserId(request);
+    let checkIdParams = {
       TableName: tableName,
-      KeyConditionExpression: "id = :id",
-      ExpressionAttributeValues: {
-        ":id": request.params.postId,
+      Key: {
+        id: request.params.postId,
+        title: "POST#" + request.params.postTitle,
       },
     };
-    let items = [];
-
-    await dynamodb.query(params, (error, result) => {
+    await dynamodb.get(checkIdParams, async (error, res) => {
       if (error) {
-        response.json({ statusCode: 500, error: error.message });
-        return;
+        console.log(error);
+        return "error";
       } else {
-        console.log(result.Items);
-
-        let paramsDelete = {
-          RequestItems: {},
-        };
-        paramsDelete.RequestItems[tableName] = result.Items.map((value) => {
-          let a = {
-            DeleteRequest: {
-              Key: {
-                id: request.params.postId,
-                title: value.title,
-              },
+        let posterId = res.Item.userId;
+        if (getUserId(request) === posterId) {
+          let params = {
+            TableName: tableName,
+            KeyConditionExpression: "id = :id",
+            ExpressionAttributeValues: {
+              ":id": request.params.postId,
             },
           };
-          return a;
-        });
-        paramsDelete.RequestItems[tableName].forEach((element) => {
-          console.log(element.DeleteRequest.Key.id);
-          console.log(element.DeleteRequest.Key.title);
-        });
 
-        dynamodb.batchWrite(paramsDelete, (error, result) => {
+          await dynamodb.query(params, (error, result) => {
+            if (error) {
+              response.json({ statusCode: 500, error: error.message });
+              return;
+            } else {
+              console.log(result.Items);
+
+              let paramsDelete = {
+                RequestItems: {},
+              };
+              paramsDelete.RequestItems[tableName] = result.Items.map(
+                (value) => {
+                  let a = {
+                    DeleteRequest: {
+                      Key: {
+                        id: request.params.postId,
+                        title: value.title,
+                      },
+                    },
+                  };
+                  return a;
+                }
+              );
+              paramsDelete.RequestItems[tableName].forEach((element) => {
+                console.log(element.DeleteRequest.Key.id);
+                console.log(element.DeleteRequest.Key.title);
+              });
+
+              dynamodb.batchWrite(paramsDelete, (error, result) => {
+                if (error) {
+                  response.json({
+                    statusCode: 500,
+                    error: error.message,
+                    url: request.url,
+                  });
+                  return;
+                } else {
+                  response.json({
+                    statusCode: 200,
+                    url: request.url,
+                    body: JSON.stringify(result),
+                  });
+                  return;
+                }
+              });
+            }
+          });
+        } else {
+          response.json({
+            statusCode: 403,
+            url: request.url,
+            error: "Forbidden",
+          });
+          return;
+        }
+      }
+    });
+  }
+);
+
+// app.delete(
+//   "/posts/deleteComment",
+//   async function (request, response) {
+//     // const requestUserId = getUserId(request);
+//     let checkIdParams = {
+//       TableName: tableName,
+//       Key: {
+//         id: request.params.postId,
+//         title: "POST#" + request.params.postTitle,
+//       },
+//     };
+//     await dynamodb.get(checkIdParams, async (error, res) => {
+//       if (error) {
+//         console.log(error);
+//         return "error";
+//       } else {
+//         let posterId = res.Item.userId;
+//         if (getUserId(request) === posterId) {
+//         } else {
+//           response.json({
+//             statusCode: 403,
+//             url: request.url,
+//             error: "Forbidden",
+//           });
+//         }
+//       }
+//     });
+//   }
+// );
+
+// app.delete("/posts/deleteComment", async function (request, response) {
+//   if (
+//     getUserId(request) === request.body.userId ||
+//     getUserId(request) === request.body.postUserId
+//   ) {
+//     let params = {
+//       TableName: tableName,
+//       Key: {
+//         id: request.body.postId,
+//         title: request.body.commentId,
+//       },
+//     };
+//     dynamodb.delete(params, (error, result) => {
+//       if (error) {
+//         response.json({
+//           statusCode: 500,
+//           error: error.message,
+//           url: request.url,
+//         });
+//       } else {
+//         response.json({
+//           statusCode: 200,
+//           url: request.url,
+//           body: JSON.stringify(result),
+//         });
+//       }
+//     });
+//   } else {
+//     response.json({
+//       statusCode: 403,
+//       url: request.url,
+//       error: "Forbidden",
+//     });
+//   }
+// });
+
+app.delete("/posts/deleteComment", async function (request, response) {
+  // const requestUserId = getUserId(request);
+  let checkIdParams = {
+    TableName: tableName,
+    Key: {
+      id: request.body.postId,
+      title: "POST#" + request.body.postTitle,
+    },
+  };
+  await dynamodb.get(checkIdParams, async (error, res) => {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log("res: ", res);
+      let posterId = res.Item.userId;
+      if (getUserId(request) === posterId) {
+        let params = {
+          TableName: tableName,
+          Key: {
+            id: request.body.postId,
+            title: "COMMENT#" + request.body.commentId,
+          },
+        };
+        dynamodb.delete(params, (error, result) => {
           if (error) {
             response.json({
               statusCode: 500,
@@ -496,51 +640,48 @@ app.delete("/posts/deletePost/:postId", async function (request, response) {
             return;
           }
         });
-      }
-    });
-  } else {
-    response.json({
-      statusCode: 403,
-      url: request.url,
-      error: "Forbidden",
-    });
-  }
-});
-
-app.delete("/posts/deleteComment", async function (request, response) {
-  if (
-    getUserId(request) === request.body.userId ||
-    getUserId(request) === request.body.postUserId
-  ) {
-    let params = {
-      TableName: tableName,
-      Key: {
-        id: request.body.postId,
-        title: request.body.commentId,
-      },
-    };
-    dynamodb.delete(params, (error, result) => {
-      if (error) {
-        response.json({
-          statusCode: 500,
-          error: error.message,
-          url: request.url,
-        });
       } else {
-        response.json({
-          statusCode: 200,
-          url: request.url,
-          body: JSON.stringify(result),
+        checkIdParams.title = "COMMENT#" + request.body.commentId;
+        await dynamodb.get(checkIdParams, async (error, resComment) => {
+          let commenterId = resComment.Item.userId;
+          console.log("resComment: ", resComment);
+          if (getUserId(request) === commenterId) {
+            let params = {
+              TableName: tableName,
+              Key: {
+                id: request.body.postId,
+                title: request.body.commentId,
+              },
+            };
+            dynamodb.delete(params, (error, result) => {
+              if (error) {
+                response.json({
+                  statusCode: 500,
+                  error: error.message,
+                  url: request.url,
+                });
+                return;
+              } else {
+                response.json({
+                  statusCode: 200,
+                  url: request.url,
+                  body: JSON.stringify(result),
+                });
+                return;
+              }
+            });
+          } else {
+            response.json({
+              statusCode: 403,
+              url: request.url,
+              error: "Forbidden",
+            });
+            return;
+          }
         });
       }
-    });
-  } else {
-    response.json({
-      statusCode: 403,
-      url: request.url,
-      error: "Forbidden",
-    });
-  }
+    }
+  });
 });
 
 app.listen(3000, function () {
