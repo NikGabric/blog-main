@@ -40,7 +40,8 @@
                 </div>
               </div>
               <p class="text-muted">
-                {{ post.updatedAt }}
+                {{ post.updatedAt.split("T")[0] }}
+                {{ post.updatedAt.split("T")[1].substring(0, 8) }}
                 <b>by user: </b>
                 {{ post.author }}
               </p>
@@ -63,7 +64,8 @@
                 <div class="col-md-10">
                   <a>{{ comment.content }}</a>
                   <p class="text-muted">
-                    {{ comment.updatedAt }}
+                    {{ comment.updatedAt.split("T")[0] }}
+                    {{ comment.updatedAt.split("T")[1].substring(0, 8) }}
                     <b>by user: </b>
                     {{ comment.author }}
                   </p>
