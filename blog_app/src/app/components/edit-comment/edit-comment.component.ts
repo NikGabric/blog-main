@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
+import { Location } from '@angular/common';
 import { Comment } from 'src/app/classes/comment';
 
 import { CognitoService } from 'src/app/services/cognito.service';
@@ -17,7 +18,8 @@ export class EditCommentComponent implements OnInit {
   constructor(
     public route: ActivatedRoute,
     public cognitoService: CognitoService,
-    private router: Router
+    private router: Router,
+    private location: Location
   ) {
     this.postId = this.route.snapshot.paramMap.get('postId');
     this.commentId = this.route.snapshot.paramMap.get('commentId');
@@ -80,13 +82,12 @@ export class EditCommentComponent implements OnInit {
       },
     };
 
-    console.log(reqOptions);
     const apiPathCommentEdit = apiPath + '/editComment';
-    console.log(apiPathCommentEdit);
 
     API.put(apiName, apiPathCommentEdit, reqOptions)
       .then((result) => {
-        this.router.navigate(['/']);
+        // this.router.navigate(['..']);
+        this.location.back();
       })
       .catch((err) => {
         console.log(err);
