@@ -22,12 +22,14 @@ export class EditCommentComponent implements OnInit {
     this.postId = this.route.snapshot.paramMap.get('postId');
     this.commentId = this.route.snapshot.paramMap.get('commentId');
     this.commentParams = new Comment();
+    this.fieldEmpty = false;
   }
 
   // Data for getting comment from DB
   private postId: string | null;
   private commentId: string | null;
   public commentParams: Comment;
+  public fieldEmpty: boolean;
 
   private async getCommentData(): Promise<void> {
     var token: string | null;
@@ -53,6 +55,11 @@ export class EditCommentComponent implements OnInit {
   }
 
   public async editComment(): Promise<void> {
+    if (this.commentParams.content === '') {
+      this.fieldEmpty = true;
+      return;
+    }
+
     var token: string | null;
     var user: any;
     try {

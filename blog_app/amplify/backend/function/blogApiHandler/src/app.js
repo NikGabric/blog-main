@@ -211,10 +211,12 @@ app.get("/posts/commentVotes/:postId/:commentId", function (request, response) {
 
 app.put("/posts/editPost", async function (request, response) {
   if (
-    request.body.title === undefined ||
+    request.body.oldPostTitle === undefined ||
     request.body.content === undefined ||
-    request.body.title === "" ||
-    request.body.content === ""
+    request.body.postTitle === undefined ||
+    request.body.oldPostTitle === "" ||
+    request.body.content === "" ||
+    request.body.postTitle === ""
   ) {
     response.statusCode = 403;
     response.json({
@@ -263,7 +265,7 @@ app.put("/posts/editPost", async function (request, response) {
           params.ExpressionAttributeValues[":content"] = request.body.content;
           params.UpdateExpression += "#content = :content, ";
         }
-        if (request.body.title || request.body.content) {
+        if (request.body.postTitle || request.body.content) {
           params.ExpressionAttributeValues[":updatedAt"] = timestamp;
           params.UpdateExpression += "updatedAt = :updatedAt";
         }
@@ -297,6 +299,16 @@ app.put("/posts/editPost", async function (request, response) {
 });
 
 app.put("/posts/editComment", async function (request, response) {
+  if (request.body.content === undefined || request.body.content === "") {
+    response.statusCode = 403;
+    response.json({
+      text: "Nope!",
+      error: "Forbidden",
+      url: request.url,
+    });
+    return;
+  }
+
   let checkIdParams = {
     TableName: tableName,
     Key: {
@@ -329,7 +341,7 @@ app.put("/posts/editComment", async function (request, response) {
           params.ExpressionAttributeValues[":content"] = request.body.content;
           params.UpdateExpression += "#content = :content, ";
         }
-        if (request.body.title || request.body.content) {
+        if (request.body.content) {
           params.ExpressionAttributeValues[":updatedAt"] = timestamp;
           params.UpdateExpression += "updatedAt = :updatedAt";
         }

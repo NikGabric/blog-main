@@ -28,6 +28,7 @@ export class EditPostComponent implements OnInit {
 
     this.postParams = new Post();
     this.oldPostTitle = '';
+    this.fieldEmpty = false;
   }
 
   // Data for getting post from DB
@@ -39,6 +40,7 @@ export class EditPostComponent implements OnInit {
 
   public postParams: Post;
   private oldPostTitle: string;
+  public fieldEmpty: boolean;
 
   private async getPostData(): Promise<void> {
     var token: string | null;
@@ -64,6 +66,16 @@ export class EditPostComponent implements OnInit {
   }
 
   public async editPost(): Promise<void> {
+    if (
+      this.postParams.postTitle === undefined ||
+      this.postParams.content === undefined ||
+      this.postParams.postTitle === '' ||
+      this.postParams.content === ''
+    ) {
+      this.fieldEmpty = true;
+      return;
+    }
+
     var token: string | null;
     var user: any;
     try {
