@@ -126,6 +126,15 @@
                 name="content"
                 [(ngModel)]="commentParams.content"
               />
+
+              <div
+                class="d-flex justify-content-start p-1"
+                style="font-size: small; color: red"
+                *ngIf="commentEmpty"
+              >
+                * Comment can't be left empty!
+              </div>
+
               <button type="submit" class="btn btn-primary m-1">Comment</button>
             </form>
           </div>

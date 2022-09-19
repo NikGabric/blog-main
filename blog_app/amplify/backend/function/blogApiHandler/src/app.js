@@ -210,6 +210,21 @@ app.get("/posts/commentVotes/:postId/:commentId", function (request, response) {
  *************************************/
 
 app.put("/posts/editPost", async function (request, response) {
+  if (
+    request.body.title === undefined ||
+    request.body.content === undefined ||
+    request.body.title === "" ||
+    request.body.content === ""
+  ) {
+    response.statusCode = 403;
+    response.json({
+      text: "Nope!",
+      error: "Forbidden",
+      url: request.url,
+    });
+    return;
+  }
+
   let checkIdParams = {
     TableName: tableName,
     Key: {
@@ -420,7 +435,12 @@ app.put("/posts/downvoteComment", function (request, response) {
  *************************************/
 
 app.post("/posts/post", function (request, response) {
-  if (request.body.title === undefined || request.body.content === undefined) {
+  if (
+    request.body.title === undefined ||
+    request.body.content === undefined ||
+    request.body.title === "" ||
+    request.body.content === ""
+  ) {
     response.statusCode = 403;
     response.json({
       text: "Nope!",
@@ -463,6 +483,16 @@ app.post("/posts/post", function (request, response) {
 });
 
 app.post("/posts/comment/:postId", function (request, response) {
+  if (request.body.content === undefined || request.body.content === "") {
+    response.statusCode = 403;
+    response.json({
+      text: "Nope!",
+      error: "Forbidden",
+      url: request.url,
+    });
+    return;
+  }
+
   const timestamp = new Date().toISOString();
   const commentId = uuidv4();
   let params = {

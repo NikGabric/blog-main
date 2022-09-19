@@ -33,6 +33,7 @@ export class PostDetailsComponent implements OnInit {
 
     this.comments = [];
     this.commentDataAvailable = false;
+    this.commentEmpty = false;
 
     this.loading = true;
   }
@@ -54,6 +55,7 @@ export class PostDetailsComponent implements OnInit {
   // Data for showing comments
   public comments: Comment[];
   public commentDataAvailable: boolean;
+  public commentEmpty: boolean;
 
   private async getPostData(): Promise<void> {
     var token: string | null;
@@ -83,6 +85,13 @@ export class PostDetailsComponent implements OnInit {
   }
 
   public async commentOnPost(): Promise<void> {
+    if (this.commentParams.content === undefined) {
+      this.commentEmpty = true;
+      return;
+    } else {
+      this.commentEmpty = false;
+    }
+
     const token = (await Auth.currentSession()).getIdToken().getJwtToken();
     const commenter = await this.cognitoService.getUser();
     this.commentParams.author = commenter.username;
