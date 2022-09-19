@@ -216,7 +216,10 @@ app.put("/posts/editPost", async function (request, response) {
     request.body.postTitle === undefined ||
     request.body.oldPostTitle === "" ||
     request.body.content === "" ||
-    request.body.postTitle === ""
+    request.body.postTitle === "" ||
+    request.body.postTitle.includes("/") ||
+    request.body.postTitle.includes("#") ||
+    request.body.postTitle.includes("%")
   ) {
     response.statusCode = 403;
     response.json({

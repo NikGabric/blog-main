@@ -29,6 +29,7 @@ export class EditPostComponent implements OnInit {
     this.postParams = new Post();
     this.oldPostTitle = '';
     this.fieldEmpty = false;
+    this.charErr = false;
   }
 
   // Data for getting post from DB
@@ -41,6 +42,7 @@ export class EditPostComponent implements OnInit {
   public postParams: Post;
   private oldPostTitle: string;
   public fieldEmpty: boolean;
+  public charErr: boolean;
 
   private async getPostData(): Promise<void> {
     var token: string | null;
@@ -74,6 +76,13 @@ export class EditPostComponent implements OnInit {
     ) {
       this.fieldEmpty = true;
       return;
+    } else if (
+      this.postParams.title.includes('/') ||
+      this.postParams.title.includes('#') ||
+      this.postParams.title.includes('%')
+    ) {
+      this.charErr = true;
+      //   return;
     }
 
     var token: string | null;
