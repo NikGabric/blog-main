@@ -16,8 +16,12 @@ export class AppComponent implements OnInit {
   }
 
   public ngOnInit(): void {
-    this.cognitoService.isAuthenticated().then((success: boolean) => {
-      this.isAuthenticated = success;
+    this.router.events.subscribe((event) => {
+      if (event.constructor.name == 'NavigationEnd') {
+        this.cognitoService.isAuthenticated().then((success: boolean) => {
+          this.isAuthenticated = success;
+        });
+      }
     });
   }
 
