@@ -74,7 +74,9 @@ app.get(path, function (request, response) {
   };
   dynamodb.scan(params, (error, result) => {
     if (error) {
-      response.json({ statusCode: 500, error: error.message });
+      response.statusCode = 500;
+      response.json({ error: error.message });
+      return;
     } else {
       for (var i = 0; i < result.Items.length; i++) {
         if (result.Items[i].title.startsWith("COMMENT#")) {
@@ -82,11 +84,12 @@ app.get(path, function (request, response) {
           i--;
         }
       }
+      response.statusCode = 200;
       response.json({
-        statusCode: 200,
         url: request.url,
         body: JSON.stringify(result.Items),
       });
+      return;
     }
   });
 });
@@ -107,13 +110,16 @@ app.get("/posts/comments/:postId", function (request, response) {
   };
   dynamodb.query(params, (error, result) => {
     if (error) {
-      response.json({ statusCode: 500, error: error.message });
+      response.statusCode = 500;
+      response.json({ error: error.message });
+      return;
     } else {
+      response.statusCode = 200;
       response.json({
-        statusCode: 200,
         url: request.url,
         body: JSON.stringify(result.Items),
       });
+      return;
     }
   });
 });
@@ -132,13 +138,16 @@ app.get("/posts/post/:postTitle/:postId", function (request, response) {
   };
   dynamodb.get(params, (error, result) => {
     if (error) {
-      response.json({ statusCode: 500, error: error.message });
+      response.statusCode = 500;
+      response.json({ error: error.message });
+      return;
     } else {
+      response.statusCode = 200;
       response.json({
-        statusCode: 200,
         url: request.url,
         body: JSON.stringify(result.Item),
       });
+      return;
     }
   });
 });
@@ -158,13 +167,16 @@ app.get("/posts/comment/:postId/:commentId", function (request, response) {
   };
   dynamodb.query(params, (error, result) => {
     if (error) {
-      response.json({ statusCode: 500, error: error.message });
+      response.statusCode = 500;
+      response.json({ error: error.message });
+      return;
     } else {
+      response.statusCode = 200;
       response.json({
-        statusCode: 200,
         url: request.url,
         body: JSON.stringify(result.Items),
       });
+      return;
     }
   });
 });
@@ -179,13 +191,16 @@ app.get("/posts/commentVotes/:postId/:commentId", function (request, response) {
   };
   dynamodb.get(params, (error, result) => {
     if (error) {
-      response.json({ statusCode: 500, error: error.message });
+      response.statusCode = 500;
+      response.json({ error: error.message });
+      return;
     } else {
+      response.statusCode = 200;
       response.json({
-        statusCode: 200,
         url: request.url,
         body: JSON.stringify(result.Item),
       });
+      return;
     }
   });
 });
@@ -239,25 +254,28 @@ app.put("/posts/editPost", async function (request, response) {
         }
         dynamodb.update(params, (error, result) => {
           if (error) {
+            response.statusCode = 500;
             response.json({
-              statusCode: 500,
               error: error.message,
               url: request.url,
             });
+            return;
           } else {
+            response.statusCode = 200;
             response.json({
-              statusCode: 200,
               url: request.url,
               body: JSON.stringify(result.Attributes),
             });
+            return;
           }
         });
       } else {
+        response.statusCode = 403;
         response.json({
-          statusCode: 403,
           url: request.url,
           error: "Forbidden",
         });
+        return;
       }
     }
   });
@@ -302,25 +320,28 @@ app.put("/posts/editComment", async function (request, response) {
         }
         dynamodb.update(params, (error, result) => {
           if (error) {
+            response.statusCode = 500;
             response.json({
-              statusCode: 500,
               error: error.message,
               url: request.url,
             });
+            return;
           } else {
+            response.statusCode = 200;
             response.json({
-              statusCode: 200,
               url: request.url,
               body: JSON.stringify(result.Attributes),
             });
+            return;
           }
         });
       } else {
+        response.statusCode = 403;
         response.json({
-          statusCode: 403,
           url: request.url,
           error: "Forbidden",
         });
+        return;
       }
     }
   });
@@ -343,17 +364,19 @@ app.put("/posts/upvoteComment", function (request, response) {
   };
   dynamodb.update(params, (error, result) => {
     if (error) {
+      response.statusCode = 500;
       response.json({
-        statusCode: 500,
         error: error.message,
         url: request.url,
       });
+      return;
     } else {
+      response.statusCode = 200;
       response.json({
-        statusCode: 200,
         url: request.url,
         body: JSON.stringify(result.Attributes),
       });
+      return;
     }
   });
 });
@@ -375,17 +398,19 @@ app.put("/posts/downvoteComment", function (request, response) {
   };
   dynamodb.update(params, (error, result) => {
     if (error) {
+      response.statusCode = 500;
       response.json({
-        statusCode: 500,
         error: error.message,
         url: request.url,
       });
+      return;
     } else {
+      response.statusCode = 200;
       response.json({
-        statusCode: 200,
         url: request.url,
         body: JSON.stringify(result.Attributes),
       });
+      return;
     }
   });
 });
@@ -395,6 +420,16 @@ app.put("/posts/downvoteComment", function (request, response) {
  *************************************/
 
 app.post("/posts/post", function (request, response) {
+  if (request.body.title === undefined || request.body.content === undefined) {
+    response.statusCode = 403;
+    response.json({
+      text: "Nope!",
+      error: "Forbidden",
+      url: request.url,
+    });
+    return;
+  }
+
   const timestamp = new Date().toISOString();
   request.body.title = "POST#" + request.body.title;
   let params = {
@@ -410,17 +445,19 @@ app.post("/posts/post", function (request, response) {
   };
   dynamodb.put(params, (error, result) => {
     if (error) {
+      response.statusCode = 500;
       response.json({
-        statusCode: 500,
         error: error.message,
         url: request.url,
       });
+      return;
     } else {
+      response.statusCode = 200;
       response.json({
-        statusCode: 200,
         url: request.url,
         body: JSON.stringify(params.Item),
       });
+      return;
     }
   });
 });
@@ -442,17 +479,19 @@ app.post("/posts/comment/:postId", function (request, response) {
   };
   dynamodb.put(params, (error, result) => {
     if (error) {
+      response.statusCode = 500;
       response.json({
-        statusCode: 500,
         error: error.message,
         url: request.url,
       });
+      return;
     } else {
+      response.statusCode = 200;
       response.json({
-        statusCode: 200,
         url: request.url,
         body: JSON.stringify(params.Item),
       });
+      return;
     }
   });
 });
@@ -501,7 +540,8 @@ app.delete(
 
           await dynamodb.query(params, (error, result) => {
             if (error) {
-              response.json({ statusCode: 500, error: error.message });
+              response.statusCode = 500;
+              response.json({ error: error.message });
               return;
             } else {
               console.log(result.Items);
@@ -529,15 +569,15 @@ app.delete(
 
               dynamodb.batchWrite(paramsDelete, (error, result) => {
                 if (error) {
+                  response.statusCode = 500;
                   response.json({
-                    statusCode: 500,
                     error: error.message,
                     url: request.url,
                   });
                   return;
                 } else {
+                  response.statusCode = 200;
                   response.json({
-                    statusCode: 200,
                     url: request.url,
                     body: JSON.stringify(result),
                   });
@@ -547,8 +587,8 @@ app.delete(
             }
           });
         } else {
+          response.statusCode = 403;
           response.json({
-            statusCode: 403,
             url: request.url,
             error: "Forbidden",
           });
@@ -650,15 +690,15 @@ app.delete("/posts/deleteComment", async function (request, response) {
         };
         dynamodb.delete(params, (error, result) => {
           if (error) {
+            response.statusCode = 500;
             response.json({
-              statusCode: 500,
               error: error.message,
               url: request.url,
             });
             return;
           } else {
+            response.statusCode = 200;
             response.json({
-              statusCode: 200,
               url: request.url,
               body: JSON.stringify(result),
             });
@@ -680,15 +720,15 @@ app.delete("/posts/deleteComment", async function (request, response) {
             };
             dynamodb.delete(params, (error, result) => {
               if (error) {
+                response.statusCode = 500;
                 response.json({
-                  statusCode: 500,
                   error: error.message,
                   url: request.url,
                 });
                 return;
               } else {
+                response.statusCode = 200;
                 response.json({
-                  statusCode: 200,
                   url: request.url,
                   body: JSON.stringify(result),
                 });
@@ -696,8 +736,8 @@ app.delete("/posts/deleteComment", async function (request, response) {
               }
             });
           } else {
+            response.statusCode = 403;
             response.json({
-              statusCode: 403,
               url: request.url,
               error: "Forbidden",
             });
