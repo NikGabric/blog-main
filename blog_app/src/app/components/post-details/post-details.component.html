@@ -69,7 +69,7 @@
                   </p>
                   <p>
                     <span class="vote-count">
-                      {{ comment.upvotes }}
+                      {{ comment.upvoterIds.length }}
                     </span>
                     <span
                       class="fa fa-arrow-up vote up"
@@ -82,11 +82,13 @@
                     >
                     </span>
                     <span class="vote-count">
-                      {{ comment.downvotes }}
+                      {{ comment.downvoterIds.length }}
                     </span>
                     <span class="ml-3 mr-3"
                       >Comment score:
-                      {{ comment.upvotes - comment.downvotes }}</span
+                      {{
+                        comment.upvoterIds.length - comment.downvoterIds.length
+                      }}</span
                     >
                   </p>
                 </div>

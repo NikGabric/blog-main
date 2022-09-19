@@ -96,8 +96,8 @@ export class PostDetailsComponent implements OnInit {
     const commenter = await this.cognitoService.getUser();
     this.commentParams.author = commenter.username;
     this.commentParams.userId = commenter.attributes.sub;
-    this.commentParams.upvotes = 0;
-    this.commentParams.downvotes = 0;
+    this.commentParams.upvoterIds = [];
+    this.commentParams.downvoterIds = [];
     const reqOptions = {
       Authorization: token,
       body: this.commentParams,
@@ -134,7 +134,8 @@ export class PostDetailsComponent implements OnInit {
     await API.get(apiName, apiPathComents, reqOptions)
       .then((result) => {
         this.comments = JSON.parse(result.body).sort(
-          (objA: Comment, objB: Comment) => objB.upvotes - objA.upvotes
+          (objA: Comment, objB: Comment) =>
+            objB.upvoterIds.length - objA.upvoterIds.length
         );
         this.comments.forEach((comment) => {
           if (user != null && user.attributes.sub === comment.userId) {

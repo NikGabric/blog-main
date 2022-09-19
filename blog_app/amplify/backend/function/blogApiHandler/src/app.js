@@ -379,71 +379,219 @@ app.put("/posts/editComment", async function (request, response) {
 
 // upvoting a comment
 app.put("/posts/upvoteComment", function (request, response) {
-  const params = {
+  let params = {
     TableName: tableName,
-    Key: {
-      id: request.body.id,
-      title: request.body.title,
+    KeyConditionExpression: "#pk = :pk And #sk = :sk",
+    ExpressionAttributeValues: {
+      ":pk": request.body.id,
+      ":sk": request.body.title,
     },
     ExpressionAttributeNames: {
-      "#upvotes": "upvotes",
+      "#pk": "id",
+      "#sk": "title",
     },
-    ExpressionAttributeValues: { ":upvote": 1 },
-    UpdateExpression: "SET #upvotes = #upvotes + :upvote",
-    ReturnValues: "UPDATED_NEW",
   };
-  dynamodb.update(params, (error, result) => {
+  dynamodb.query(params, (error, result) => {
     if (error) {
       response.statusCode = 500;
-      response.json({
-        error: error.message,
-        url: request.url,
-      });
+      response.json({ error: error.message });
       return;
     } else {
-      response.statusCode = 200;
-      response.json({
-        url: request.url,
-        body: JSON.stringify(result.Attributes),
-      });
-      return;
+      const upvoterIds = result.Items[0].upvoterIds;
+      const reqUserId = getUserId(request);
+      const upvoterIndex = upvoterIds.indexOf(reqUserId);
+      if (upvoterIndex < 0) {
+        params = {
+          TableName: tableName,
+          Key: {
+            id: request.body.id,
+            title: request.body.title,
+          },
+          ExpressionAttributeNames: {
+            "#upvoterIds": "upvoterIds",
+          },
+          ExpressionAttributeValues: {
+            ":upvoterId": [reqUserId],
+          },
+          UpdateExpression:
+            "set #upvoterIds = list_append(#upvoterIds, :upvoterId)",
+          ReturnValues: "UPDATED_NEW",
+        };
+
+        dynamodb.update(params, (error, result) => {
+          if (error) {
+            response.statusCode = 500;
+            response.json({
+              error: error.message,
+              url: request.url,
+            });
+            return;
+          } else {
+            response.statusCode = 200;
+            response.json({
+              url: request.url,
+              body: JSON.stringify(result.Attributes),
+            });
+            return;
+          }
+        });
+      } else {
+        const query = "REMOVE upvoterIds[" + upvoterIndex + "]";
+        console.log(query);
+        params = {
+          TableName: tableName,
+          Key: {
+            id: request.body.id,
+            title: request.body.title,
+          },
+          UpdateExpression: query,
+          ReturnValues: "UPDATED_NEW",
+        };
+        dynamodb.update(params, (error, result) => {
+          if (error) {
+            response.statusCode = 500;
+            response.json({
+              error: error.message,
+              url: request.url,
+            });
+            return;
+          } else {
+            response.statusCode = 200;
+            response.json({
+              url: request.url,
+              body: JSON.stringify(result.Attributes),
+            });
+            return;
+          }
+        });
+      }
     }
   });
 });
 
 // downvoting a comment
 app.put("/posts/downvoteComment", function (request, response) {
-  const params = {
+  let params = {
     TableName: tableName,
-    Key: {
-      id: request.body.id,
-      title: request.body.title,
+    KeyConditionExpression: "#pk = :pk And #sk = :sk",
+    ExpressionAttributeValues: {
+      ":pk": request.body.id,
+      ":sk": request.body.title,
     },
     ExpressionAttributeNames: {
-      "#downvotes": "downvotes",
+      "#pk": "id",
+      "#sk": "title",
     },
-    ExpressionAttributeValues: { ":downvote": 1 },
-    UpdateExpression: "SET #downvotes = #downvotes + :downvote",
-    ReturnValues: "UPDATED_NEW",
   };
-  dynamodb.update(params, (error, result) => {
+  dynamodb.query(params, (error, result) => {
     if (error) {
       response.statusCode = 500;
-      response.json({
-        error: error.message,
-        url: request.url,
-      });
+      response.json({ error: error.message });
       return;
     } else {
-      response.statusCode = 200;
-      response.json({
-        url: request.url,
-        body: JSON.stringify(result.Attributes),
-      });
-      return;
+      const downvoterIds = result.Items[0].downvoterIds;
+      const reqUserId = getUserId(request);
+      const downvoterIndex = downvoterIds.indexOf(reqUserId);
+      if (downvoterIndex < 0) {
+        params = {
+          TableName: tableName,
+          Key: {
+            id: request.body.id,
+            title: request.body.title,
+          },
+          ExpressionAttributeNames: {
+            "#downvoterIds": "downvoterIds",
+          },
+          ExpressionAttributeValues: {
+            ":downvoterId": [reqUserId],
+          },
+          UpdateExpression:
+            "set #downvoterIds = list_append(#downvoterIds, :downvoterId)",
+          ReturnValues: "UPDATED_NEW",
+        };
+
+        dynamodb.update(params, (error, result) => {
+          if (error) {
+            response.statusCode = 500;
+            response.json({
+              error: error.message,
+              url: request.url,
+            });
+            return;
+          } else {
+            response.statusCode = 200;
+            response.json({
+              url: request.url,
+              body: JSON.stringify(result.Attributes),
+            });
+            return;
+          }
+        });
+      } else {
+        const query = "REMOVE downvoterIds[" + downvoterIndex + "]";
+        console.log(query);
+        params = {
+          TableName: tableName,
+          Key: {
+            id: request.body.id,
+            title: request.body.title,
+          },
+          UpdateExpression: query,
+          ReturnValues: "UPDATED_NEW",
+        };
+        dynamodb.update(params, (error, result) => {
+          if (error) {
+            response.statusCode = 500;
+            response.json({
+              error: error.message,
+              url: request.url,
+            });
+            return;
+          } else {
+            response.statusCode = 200;
+            response.json({
+              url: request.url,
+              body: JSON.stringify(result.Attributes),
+            });
+            return;
+          }
+        });
+      }
     }
   });
 });
+// app.put("/posts/downvoteComment", function (request, response) {
+//   const params = {
+//     TableName: tableName,
+//     Key: {
+//       id: request.body.id,
+//       title: request.body.title,
+//     },
+//     ExpressionAttributeNames: {
+//       "#downvotes": "downvotes",
+//     },
+//     ExpressionAttributeValues: { ":downvote": 1 },
+//     UpdateExpression: "SET #downvotes = #downvotes + :downvote",
+//     ReturnValues: "UPDATED_NEW",
+//   };
+//   dynamodb.update(params, (error, result) => {
+//     if (error) {
+//       response.statusCode = 500;
+//       response.json({
+//         error: error.message,
+//         url: request.url,
+//       });
+//       return;
+//     } else {
+//       response.statusCode = 200;
+//       response.json({
+//         url: request.url,
+//         body: JSON.stringify(result.Attributes),
+//       });
+//       return;
+//     }
+//   });
+// });
 
 /************************************
  * HTTP post method for insert object *

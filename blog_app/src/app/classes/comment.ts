@@ -6,8 +6,8 @@ export class Comment {
   'userId': string;
   'createdAt': string;
   'updatedAt': string;
-  'upvotes': number;
-  'downvotes': number;
   'allowEdit': boolean;
   'allowDelete': boolean;
+  'upvoterIds': [];
+  'downvoterIds': [];
 }
