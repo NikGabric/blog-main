@@ -6,6 +6,13 @@
           <h3 class="mb-3">Create a Post</h3>
 
           <form (ngSubmit)="createPost()" autocomplete="off" method="post">
+            <div
+              class="d-flex justify-content-start p-1"
+              style="font-size: small; color: red"
+              *ngIf="charErr"
+            >
+              * Field cannot include charactes: /, # and %!
+            </div>
             <div class="form-group mb-3">
               <!-- <label for="postTitle">Post title:</label> -->
               <input
@@ -16,6 +23,7 @@
                 [(ngModel)]="postParams.title"
               />
             </div>
+
             <div class="form-group mb-3">
               <!-- <label for="postContent">Post content:</label> -->
               <textarea

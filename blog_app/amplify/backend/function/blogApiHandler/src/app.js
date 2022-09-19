@@ -451,7 +451,10 @@ app.post("/posts/post", function (request, response) {
     request.body.title === undefined ||
     request.body.content === undefined ||
     request.body.title === "" ||
-    request.body.content === ""
+    request.body.content === "" ||
+    request.body.title.includes("/") ||
+    request.body.title.includes("#") ||
+    request.body.title.includes("%")
   ) {
     response.statusCode = 403;
     response.json({

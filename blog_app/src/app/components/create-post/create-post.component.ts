@@ -16,10 +16,12 @@ const apiPath = '/posts';
 export class CreatePostComponent implements OnInit {
   constructor(private cognitoService: CognitoService, private router: Router) {
     this.fieldEmpty = false;
+    this.charErr = false;
   }
 
   public postParams = new Post();
   public fieldEmpty: boolean;
+  public charErr: boolean;
 
   public async createPost(): Promise<void> {
     if (
@@ -27,6 +29,13 @@ export class CreatePostComponent implements OnInit {
       this.postParams.content === undefined
     ) {
       this.fieldEmpty = true;
+      return;
+    } else if (
+      this.postParams.title.includes('/') ||
+      this.postParams.title.includes('#') ||
+      this.postParams.title.includes('%')
+    ) {
+      this.charErr = true;
       return;
     } else {
       this.fieldEmpty = false;
