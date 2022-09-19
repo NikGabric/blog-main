@@ -22,7 +22,12 @@
       >
         <div class="d-flex w-100 justify-content-between">
           <h5 class="mb-1">{{ post.postTitle }}</h5>
-          <small>{{ post.updatedAt.substring(0, 10) }}</small>
+          <small>
+            <small class="text-muted">Last updated: </small>
+            <small style="color: rgb(95, 95, 239)">{{
+              post.updatedAt.substring(0, 10)
+            }}</small>
+          </small>
         </div>
         <p class="mb-1">
           {{
@@ -31,7 +36,8 @@
               : post.content
           }}
         </p>
-        <small>{{ post.author }}</small>
+        <small class="text-muted">Author: </small
+        ><small style="color: rgb(95, 95, 239)">{{ post.author }}</small>
       </a>
     </div>
   </div>
