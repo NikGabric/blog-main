@@ -68,22 +68,27 @@
                     {{ comment.author }}
                   </p>
                   <p>
-                    <span class="vote-count">
-                      {{ comment.upvoterIds.length }}
-                    </span>
+                    |
                     <span
-                      class="fa fa-arrow-up vote up"
+                      style="cursor: pointer"
                       (click)="upvote(comment.title)"
                     >
+                      <span class="vote-count">
+                        {{ comment.upvoterIds.length }}
+                      </span>
+                      <span class="fa fa-arrow-up vote up"> </span>
                     </span>
+                    |
                     <span
-                      class="fa fa-arrow-down vote down"
+                      style="cursor: pointer"
                       (click)="downvote(comment.title)"
                     >
+                      <span class="fa fa-arrow-down vote down"> </span>
+                      <span class="vote-count">
+                        {{ comment.downvoterIds.length }}
+                      </span>
                     </span>
-                    <span class="vote-count">
-                      {{ comment.downvoterIds.length }}
-                    </span>
+                    |
                     <span class="ml-3 mr-3"
                       >Comment score:
                       {{

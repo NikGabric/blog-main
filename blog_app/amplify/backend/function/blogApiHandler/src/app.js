@@ -398,7 +398,9 @@ app.put("/posts/upvoteComment", function (request, response) {
       return;
     } else {
       const upvoterIds = result.Items[0].upvoterIds;
+      const downvoterIds = result.Items[0].downvoterIds;
       const reqUserId = getUserId(request);
+      const downvoterIndex = downvoterIds.indexOf(reqUserId);
       const upvoterIndex = upvoterIds.indexOf(reqUserId);
       if (upvoterIndex < 0) {
         params = {
@@ -417,6 +419,11 @@ app.put("/posts/upvoteComment", function (request, response) {
             "set #upvoterIds = list_append(#upvoterIds, :upvoterId)",
           ReturnValues: "UPDATED_NEW",
         };
+
+        if (downvoterIndex >= 0) {
+          params.UpdateExpression +=
+            " REMOVE downvoterIds[" + downvoterIndex + "]";
+        }
 
         dynamodb.update(params, (error, result) => {
           if (error) {
@@ -490,7 +497,9 @@ app.put("/posts/downvoteComment", function (request, response) {
       return;
     } else {
       const downvoterIds = result.Items[0].downvoterIds;
+      const upvoterIds = result.Items[0].upvoterIds;
       const reqUserId = getUserId(request);
+      const upvoterIndex = upvoterIds.indexOf(reqUserId);
       const downvoterIndex = downvoterIds.indexOf(reqUserId);
       if (downvoterIndex < 0) {
         params = {
@@ -509,6 +518,10 @@ app.put("/posts/downvoteComment", function (request, response) {
             "set #downvoterIds = list_append(#downvoterIds, :downvoterId)",
           ReturnValues: "UPDATED_NEW",
         };
+
+        if (upvoterIndex >= 0) {
+          params.UpdateExpression += " REMOVE upvoterIds[" + upvoterIndex + "]";
+        }
 
         dynamodb.update(params, (error, result) => {
           if (error) {
