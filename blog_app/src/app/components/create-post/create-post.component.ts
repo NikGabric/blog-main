@@ -14,11 +14,24 @@ const apiPath = '/posts';
   styleUrls: ['./create-post.component.scss'],
 })
 export class CreatePostComponent implements OnInit {
-  constructor(private cognitoService: CognitoService, private router: Router) {}
+  constructor(private cognitoService: CognitoService, private router: Router) {
+    this.fieldEmpty = false;
+  }
 
   public postParams = new Post();
+  public fieldEmpty: boolean;
 
   public async createPost(): Promise<void> {
+    if (
+      this.postParams.title === undefined ||
+      this.postParams.content === undefined
+    ) {
+      this.fieldEmpty = true;
+      return;
+    } else {
+      this.fieldEmpty = false;
+    }
+
     const token = (await Auth.currentSession()).getIdToken().getJwtToken();
     const user = await this.cognitoService.getUser();
     this.postParams.postTitle = this.postParams.title;
