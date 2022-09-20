@@ -37,7 +37,6 @@ export class CommentOnCommentComponent implements OnInit {
   private parentId: string | null;
 
   public async submitComment(): Promise<void> {
-    console.log(this.commentParams.content);
     if (
       this.commentParams.content === '' ||
       this.commentParams.content === undefined

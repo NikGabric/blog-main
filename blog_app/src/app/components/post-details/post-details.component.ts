@@ -144,9 +144,6 @@ export class PostDetailsComponent implements OnInit {
             objB.upvoterIds.length - objA.upvoterIds.length
         );
 
-        // var _ = require('lodash');
-        // var byParentsIdsList = _.groupBy(this.comments, 'parent');
-
         this.comments.forEach((comment) => {
           if (user != null && user.attributes.sub === comment.userId) {
             comment.allowEdit = true;
@@ -155,7 +152,7 @@ export class PostDetailsComponent implements OnInit {
             comment.allowDelete = true;
           }
         });
-        console.log('comments: ', this.comments);
+
         this.sortComments(this.comments);
         this.commentDataAvailable = true;
       })
@@ -176,21 +173,16 @@ export class PostDetailsComponent implements OnInit {
       if (comment.parent === 'post') finalComments.push(comment);
     });
 
-    console.log(finalComments);
-
     for (var i = 0; i < finalComments.length; i++) {
       var parentId = finalComments[i].title;
       for (var j = 0; j < tempComments.length; j++) {
         var el = tempComments[j];
-        console.log(parentId, el);
         if (el.parent === parentId) {
           finalComments.splice(i + 1, 0, el);
           //   i++;
         }
       }
     }
-
-    console.log(finalComments);
 
     this.sortedComments = finalComments;
 
@@ -305,10 +297,9 @@ export class PostDetailsComponent implements OnInit {
     const reqOptions = {
       Authorization: token,
       body: {
-        userId: commentUserId,
+        // userId: commentUserId,
         postId: this.postId,
         commentId: commentId.replace('COMMENT#', ''),
-        postUserId: this.post.userId,
         postTitle: this.post.title.replace('POST#', ''),
       },
     };
