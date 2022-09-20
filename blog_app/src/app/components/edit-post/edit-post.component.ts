@@ -77,12 +77,12 @@ export class EditPostComponent implements OnInit {
       this.fieldEmpty = true;
       return;
     } else if (
-      this.postParams.title.includes('/') ||
-      this.postParams.title.includes('#') ||
-      this.postParams.title.includes('%')
+      this.postParams.postTitle.includes('/') ||
+      this.postParams.postTitle.includes('#') ||
+      this.postParams.postTitle.includes('%')
     ) {
       this.charErr = true;
-      //   return;
+      return;
     }
 
     var token: string | null;

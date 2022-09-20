@@ -59,12 +59,8 @@
 
             <div class="line-divider"></div>
 
-            <div
-              class=""
-              *ngFor="let comment of sortedComments"
-              [style.margin-left.px]="comment.level"
-            >
-              <div class="row">
+            <div class="" *ngFor="let comment of sortedComments">
+              <div class="row" [style.margin-left.px]="comment.level">
                 <div class="col-md-8">
                   <a>{{ comment.content }}</a>
                   <p class="text-muted">

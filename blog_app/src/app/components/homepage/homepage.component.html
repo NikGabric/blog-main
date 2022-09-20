@@ -1,4 +1,4 @@
-<div class="p-3 container col-md-6">
+<div class="p-3 container col-md-10">
   <div class="p-3 d-md-flex justify-content-md-center"><h2>BlogShite</h2></div>
   <div class="list-group">
     <div class="p-3 d-md-flex justify-content-md-center">
@@ -32,7 +32,7 @@
         <p class="mb-1">
           {{
             post.content.length > 500
-              ? (post.content | slice: 0:500) + "..."
+              ? (post.content | slice: 0:500) + " ..."
               : post.content
           }}
         </p>
