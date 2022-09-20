@@ -913,7 +913,8 @@ app.delete("/posts/deleteComment", async function (request, response) {
           }
         });
       } else {
-        checkIdParams.title = "COMMENT#" + request.body.commentId;
+        checkIdParams.Key.title = "COMMENT#" + request.body.commentId;
+        console.log(checkIdParams.Key.title);
         await dynamodb.get(checkIdParams, async (error, resComment) => {
           let commenterId = resComment.Item.userId;
           console.log("resComment: ", resComment);
@@ -922,7 +923,7 @@ app.delete("/posts/deleteComment", async function (request, response) {
               TableName: tableName,
               Key: {
                 id: request.body.postId,
-                title: request.body.commentId,
+                title: "COMMENT#" + request.body.commentId,
               },
             };
             dynamodb.delete(params, (error, result) => {
