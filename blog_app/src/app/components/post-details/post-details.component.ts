@@ -181,7 +181,7 @@ export class PostDetailsComponent implements OnInit {
       for (var j = 0; j < tempComments.length; j++) {
         var el = tempComments[j];
         if (el.parent === parentId) {
-          el.level = finalComments[i].level + 15;
+          el.level = finalComments[i].level + 30;
           finalComments.splice(i + 1, 0, el);
           //   i++;
         }

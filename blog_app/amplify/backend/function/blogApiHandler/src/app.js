@@ -219,7 +219,8 @@ app.put("/posts/editPost", async function (request, response) {
     request.body.postTitle === "" ||
     request.body.postTitle.includes("/") ||
     request.body.postTitle.includes("#") ||
-    request.body.postTitle.includes("%")
+    request.body.postTitle.includes("%") ||
+    request.body.title.includes("!")
   ) {
     response.statusCode = 403;
     response.json({
@@ -618,7 +619,8 @@ app.post("/posts/post", function (request, response) {
     request.body.content === "" ||
     request.body.title.includes("/") ||
     request.body.title.includes("#") ||
-    request.body.title.includes("%")
+    request.body.title.includes("%") ||
+    request.body.title.includes("!")
   ) {
     response.statusCode = 403;
     response.json({

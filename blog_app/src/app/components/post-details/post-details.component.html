@@ -55,12 +55,20 @@
                 {{ post.content }}
               </p>
             </div>
-            <hr />
+            <!-- <hr /> -->
 
-            <div class="line-divider"></div>
-
-            <div class="" *ngFor="let comment of sortedComments">
-              <div class="row" [style.margin-left.px]="comment.level">
+            <div
+              class=""
+              *ngFor="let comment of sortedComments"
+              [style.margin-left.px]="comment.level"
+            >
+              <div
+                class="row p-1"
+                style="
+                  border-left: 1px solid lightslategrey;
+                  border-bottom: 1px solid lightslategrey;
+                "
+              >
                 <div class="col-md-8">
                   <a>{{ comment.content }}</a>
                   <p class="text-muted">
@@ -139,7 +147,7 @@
                     Edit
                   </button>
                 </div>
-                <hr />
+                <!-- <hr /> -->
               </div>
             </div>
             <form

@@ -79,7 +79,8 @@ export class EditPostComponent implements OnInit {
     } else if (
       this.postParams.postTitle.includes('/') ||
       this.postParams.postTitle.includes('#') ||
-      this.postParams.postTitle.includes('%')
+      this.postParams.postTitle.includes('%') ||
+      this.postParams.postTitle.includes('!')
     ) {
       this.charErr = true;
       return;

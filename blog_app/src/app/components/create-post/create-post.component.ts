@@ -33,7 +33,8 @@ export class CreatePostComponent implements OnInit {
     } else if (
       this.postParams.title.includes('/') ||
       this.postParams.title.includes('#') ||
-      this.postParams.title.includes('%')
+      this.postParams.title.includes('%') ||
+      this.postParams.title.includes('!')
     ) {
       this.charErr = true;
       return;
