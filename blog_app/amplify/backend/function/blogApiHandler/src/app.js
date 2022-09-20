@@ -636,7 +636,6 @@ app.post("/posts/post", function (request, response) {
     Item: {
       ...request.body,
       id: uuidv4(), // auto-generate id
-      complete: false,
       createdAt: timestamp,
       updatedAt: timestamp,
       userId: getUserId(request), // userId from request
@@ -680,7 +679,6 @@ app.post("/posts/comment/:postId", function (request, response) {
       ...request.body,
       id: request.params.postId,
       title: "COMMENT#" + commentId,
-      complete: false,
       createdAt: timestamp,
       updatedAt: timestamp,
       userId: getUserId(request), // userId from request
