@@ -10,4 +10,5 @@ export class Comment {
   'allowDelete': boolean;
   'upvoterIds': [];
   'downvoterIds': [];
+  'parent': string;
 }

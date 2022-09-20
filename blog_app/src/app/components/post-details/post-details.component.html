@@ -59,9 +59,9 @@
 
             <div class="line-divider"></div>
 
-            <div class="" *ngFor="let comment of comments">
+            <div class="" *ngFor="let comment of sortedComments">
               <div class="row">
-                <div class="col-md-10">
+                <div class="col-md-8">
                   <a>{{ comment.content }}</a>
                   <p class="text-muted">
                     {{ comment.updatedAt.split("T")[0] }}
@@ -108,7 +108,17 @@
                     >
                   </p>
                 </div>
-                <div class="col-md-2 p-2">
+                <div class="col-md-4 p-2">
+                  <button
+                    class="btn btn-primary m-1"
+                    [routerLink]="[
+                      '/comment-on-comment',
+                      postId,
+                      comment.title.replace('COMMENT#', '')
+                    ]"
+                  >
+                    Comment
+                  </button>
                   <button
                     class="btn btn-primary m-1"
                     (click)="deleteComment(comment.title, comment.userId)"

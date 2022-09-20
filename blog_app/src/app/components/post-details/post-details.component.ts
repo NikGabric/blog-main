@@ -35,6 +35,8 @@ export class PostDetailsComponent implements OnInit {
     this.commentDataAvailable = false;
     this.commentEmpty = false;
 
+    this.sortedComments = [];
+
     this.loading = true;
   }
 
@@ -56,6 +58,8 @@ export class PostDetailsComponent implements OnInit {
   public comments: Comment[];
   public commentDataAvailable: boolean;
   public commentEmpty: boolean;
+
+  public sortedComments: Comment[];
 
   private async getPostData(): Promise<void> {
     var token: string | null;
@@ -98,6 +102,7 @@ export class PostDetailsComponent implements OnInit {
     this.commentParams.userId = commenter.attributes.sub;
     this.commentParams.upvoterIds = [];
     this.commentParams.downvoterIds = [];
+    this.commentParams.parent = 'post';
     const reqOptions = {
       Authorization: token,
       body: this.commentParams,
@@ -116,6 +121,7 @@ export class PostDetailsComponent implements OnInit {
   }
 
   private async getComments(): Promise<void> {
+    this.sortedComments = [];
     var token: string | null;
     var user: any;
     try {
@@ -137,6 +143,10 @@ export class PostDetailsComponent implements OnInit {
           (objA: Comment, objB: Comment) =>
             objB.upvoterIds.length - objA.upvoterIds.length
         );
+
+        // var _ = require('lodash');
+        // var byParentsIdsList = _.groupBy(this.comments, 'parent');
+
         this.comments.forEach((comment) => {
           if (user != null && user.attributes.sub === comment.userId) {
             comment.allowEdit = true;
@@ -145,11 +155,63 @@ export class PostDetailsComponent implements OnInit {
             comment.allowDelete = true;
           }
         });
+        console.log('comments: ', this.comments);
+        this.sortComments(this.comments);
         this.commentDataAvailable = true;
       })
       .catch((err) => {
         console.log('Error: ', err);
       });
+  }
+
+  private sortComments(
+    tempComments: Comment[]
+    // parentId: string,
+    // index: number
+  ): void {
+    var finalComments: Comment[];
+    finalComments = [];
+
+    tempComments.forEach((comment) => {
+      if (comment.parent === 'post') finalComments.push(comment);
+    });
+
+    console.log(finalComments);
+
+    for (var i = 0; i < finalComments.length; i++) {
+      var parentId = finalComments[i].title;
+      for (var j = 0; j < tempComments.length; j++) {
+        var el = tempComments[j];
+        console.log(parentId, el);
+        if (el.parent === parentId) {
+          finalComments.splice(i + 1, 0, el);
+          //   i++;
+        }
+      }
+    }
+
+    console.log(finalComments);
+
+    this.sortedComments = finalComments;
+
+    // console.log(parentId);
+    // console.log(index);
+    // if (tempComments.length <= index) return;
+
+    // var com1 = tempComments[index];
+    // console.log(com1.content);
+
+    // if (com1.parent === parentId) {
+    //   console.log('push');
+    //   this.sortedComments.push(com1);
+    //   tempComments[index].parent = 'nope';
+    //   index = 0;
+    //   parentId = com1.title;
+    //   this.sortComments(tempComments, parentId, index);
+    // } else {
+    //   index += 1;
+    //   this.sortComments(tempComments, parentId, index);
+    // }
   }
 
   public async deletePost(): Promise<void> {

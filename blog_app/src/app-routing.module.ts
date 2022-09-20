@@ -7,6 +7,7 @@ import { PostDetailsComponent } from './app/components/post-details/post-details
 import { RegisterComponent } from './app/components/register/register.component';
 import { EditPostComponent } from './app/components/edit-post/edit-post.component';
 import { EditCommentComponent } from './app/components/edit-comment/edit-comment.component';
+import { CommentOnCommentComponent } from './app/components/comment-on-comment/comment-on-comment.component';
 
 const routes: Routes = [
   { path: 'post-details/:postTitle/:postId', component: PostDetailsComponent },
@@ -14,6 +15,10 @@ const routes: Routes = [
   {
     path: 'edit-comment/:postId/:commentId',
     component: EditCommentComponent,
+  },
+  {
+    path: 'comment-on-comment/:postId/:commentId',
+    component: CommentOnCommentComponent,
   },
   { path: 'create-post', component: CreatePostComponent },
   { path: 'register', component: RegisterComponent },
