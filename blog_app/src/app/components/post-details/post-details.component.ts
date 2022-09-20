@@ -170,7 +170,10 @@ export class PostDetailsComponent implements OnInit {
     finalComments = [];
 
     tempComments.forEach((comment) => {
-      if (comment.parent === 'post') finalComments.push(comment);
+      if (comment.parent === 'post') {
+        comment.level = 0;
+        finalComments.push(comment);
+      }
     });
 
     for (var i = 0; i < finalComments.length; i++) {
@@ -178,6 +181,7 @@ export class PostDetailsComponent implements OnInit {
       for (var j = 0; j < tempComments.length; j++) {
         var el = tempComments[j];
         if (el.parent === parentId) {
+          el.level = finalComments[i].level + 15;
           finalComments.splice(i + 1, 0, el);
           //   i++;
         }

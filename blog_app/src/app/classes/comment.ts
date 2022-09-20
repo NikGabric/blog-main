@@ -11,4 +11,5 @@ export class Comment {
   'upvoterIds': [];
   'downvoterIds': [];
   'parent': string;
+  'level': number;
 }
